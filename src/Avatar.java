@@ -13,6 +13,15 @@ public class Avatar {
         this.pv = 0;
     }
 
+    public Avatar(String id, String name, String mdp, int pv) {
+        this.id  = id;
+        this.name = name;
+        this.mdp = mdp;
+        this.pv = pv;
+    }
+
+    public Avatar() {}
+
     public String getId() {
         return id;
     }

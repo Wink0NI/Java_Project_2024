@@ -1,7 +1,7 @@
 public class Main {
-    
+
     public static void main(String[] args) {
-        Jeu jeu = new Jeu();
+        Interface_Connexion jeu = new Interface_Connexion();
         jeu.menu_connexion();
         
     }

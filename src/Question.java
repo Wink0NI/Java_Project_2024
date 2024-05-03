@@ -1,22 +1,25 @@
+import java.util.List;
+
 public class Question {
     private int question_id;
     private String question;
-    private String[] choix;
-    private String[] responses;
+    private List<String> choix;
+    private String response;
     private int points;
 
-    public Question(int question_id, String question, String[] choix, String[] response, int points) {
+    public Question(int question_id, String question, List<String> choix, String response, int points) {
         this.question_id = question_id;
         this.question = question;
-        this.responses = response;
+        this.response = response;
         this.points = points;
+        this.choix = choix;
     }
 
     public String getQuestion() {
         return question;
     }
 
-    public String[] getChoices() {
+    public List<String> getChoices() {
         return choix;
     }
 
@@ -24,8 +27,8 @@ public class Question {
         return question_id;
     }
 
-    public String[] getResponse() {
-        return responses;
+    public String getResponse() {
+        return response;
     }
 
     public int getPoints() {
