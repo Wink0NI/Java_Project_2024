@@ -39,11 +39,29 @@ public class Interface_Jeu {
     }
 
     private void defi_solo(String user) {
-        int nb_questions = Math.min(20, dbProcess.get_nb_questions());
-
+        
+        String theme = "";
         System.out.println("Défi solo");
         System.out.println(
                 "-----------------------------------------------------------------------------------------------------------------------------------------------------------");
+
+        while (true) {
+            System.out.println(String.format("Choisissez le thème:\nThèmes:\n- Tout\n%s", dbProcess.getThemes()));
+            theme = scanner.next().toLowerCase();
+            if (dbProcess.isTheme(theme) || theme.equals("tout")) {
+                if (theme.equals("tout")) theme = "";
+                break;
+            }
+
+            System.out.println(String.format("Le thème %s n'esiste pas", theme));
+            gestion.wait(1000);
+
+
+        }
+        
+        int nb_questions = Math.min(20, dbProcess.get_nb_questions(theme));
+        System.out.println(
+            "-----------------------------------------------------------------------------------------------------------------------------------------------------------");
         System.out.println(String.format("Tu devras répondre à une série de %s questions.", nb_questions));
         System.out.println("Les questions auquelles tu répondras correctement seront ajoutées dans ton cerveau !");
         System.out.println(
@@ -52,14 +70,15 @@ public class Interface_Jeu {
                 "Cependant, n'oublie pas que chaque question te fera gagner ou perdre du savoir ! Le résultat du défi ne sera qu'un bonus/malus sur ton savoir !");
         System.out.println(
                 "-----------------------------------------------------------------------------------------------------------------------------------------------------------");
-        System.out.println("Taper n'importe quoi pour débuter\nR - Annuler");
+        
+        System.out.println("Le jeu va commencer. Taper n'importe quoi pour débuter\nR - Annuler");
 
         if (scanner.next().equals("R")) {
             return;
         } else { // Le défi commence
             int score = 0;
             int currentPV = dbProcess.getUser(user).getPV();
-            List<Question> questions = dbProcess.generate_question(nb_questions);
+            List<Question> questions = dbProcess.generate_question(nb_questions, theme);
 
             System.out.println("Défi solo");
 

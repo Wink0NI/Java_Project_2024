@@ -102,12 +102,14 @@ public class DBProcess {
 
     
 
-    public int get_nb_questions() {
+    public int get_nb_questions(String theme) {
         int nb_questions = 0;
         try {
             Connection get_nb_questions_conn = DriverManager.getConnection(db_url);
             Statement get_nb_questions_stmt = get_nb_questions_conn.createStatement();
-            ResultSet resultat = get_nb_questions_stmt.executeQuery("SELECT COUNT(*) FROM Questions");
+            String query = "SELECT COUNT(*) FROM Questions";
+            if (theme.length() > 0) query += " WHERE theme = '" + theme + "';";
+            ResultSet resultat = get_nb_questions_stmt.executeQuery(query);
 
             if (resultat.next()) {
                 nb_questions = resultat.getInt("COUNT(*)");
@@ -121,13 +123,16 @@ public class DBProcess {
         return nb_questions;
     }
 
-    public List<Question> generate_question(int nb_questions_totales) {
+    public List<Question> generate_question(int nb_questions_totales, String th) {
         List<Question> questions = new ArrayList<Question>();
   
         try {
             Connection generate_question_conn = DriverManager.getConnection(db_url);
             Statement generate_question_stmt = generate_question_conn.createStatement();
-            ResultSet resultat = generate_question_stmt.executeQuery(String.format("SELECT * FROM Questions ORDER BY RANDOM() LIMIT %d;", nb_questions_totales));
+
+            String where = "";
+            if (th.length() > 0) where  = String.format("WHERE theme = '%s'", th);
+            ResultSet resultat = generate_question_stmt.executeQuery(String.format("SELECT * FROM Questions %s ORDER BY RANDOM() LIMIT %d;" ,where ,nb_questions_totales));
 
             while (resultat.next()) {
                 
@@ -140,10 +145,11 @@ public class DBProcess {
                 choix.add(resultat.getString("choix3"));
                 choix.add(resultat.getString("choix4"));
                 String reponse = resultat.getString("response");
+                String theme = resultat.getString("theme");
 
                 
 
-                questions.add(new Question(id, texte, choix, reponse, val));
+                questions.add(new Question(id, texte, choix, reponse, val, theme));
             }
             generate_question_conn.close();
             return questions;
@@ -227,6 +233,52 @@ public class DBProcess {
         catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean isTheme(String theme) {
+        try {
+            Connection isTheme_conn = DriverManager.getConnection(db_url);
+            Statement isTheme_stmt = isTheme_conn.createStatement();
+
+            ResultSet resp = isTheme_stmt.executeQuery(String.format("SELECT DISTINCT theme FROM Questions WHERE theme = '%s'", theme));
+
+            if (resp.next()) {
+                isTheme_conn.close();
+                return true;
+            }
+            isTheme_conn.close();
+            
+        } 
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return false;
+    }
+
+    public String getThemes() {
+        List<String> list = new ArrayList<String>();
+        String res = "";
+        try {
+            Connection getTheme_conn = DriverManager.getConnection(db_url);
+            Statement getTheme_stmt = getTheme_conn.createStatement();
+
+            ResultSet resp = getTheme_stmt.executeQuery("SELECT DISTINCT theme FROM Questions");
+
+            while (resp.next()) {
+                list.add(resp.getString("theme"));
+            }
+            getTheme_conn.close();
+
+            for (String text : list) res += "- " + text + "\n";
+            return res;
+            
+        } 
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return res;
     }
 
 
