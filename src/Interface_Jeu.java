@@ -85,12 +85,13 @@ public class Interface_Jeu {
             for (int i = 0; i < nb_questions; i++) {
                 Question question = questions.get(i);
 
+
                 System.out.println(
                         "-----------------------------------------------------------------------------------------------------------------------------------------------------------");
                 System.out.println(String.format("Question n°%d - %s", i + 1, question.getQuestion()));
 
                 for (int num_choix = 0; num_choix < question.getChoices().size(); num_choix++) {
-                    System.out.println((num_choix + 1) + " - " + question.getChoices().get(i));
+                    System.out.println((num_choix + 1) + " - " + question.getChoices().get(num_choix));
                 }
                 System.out.print("Réponse -> ");
                 String resp = scanner.next();

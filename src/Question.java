@@ -9,6 +9,7 @@ public class Question {
     private List<String> choix; // Les choix possibles pour la réponse à la question
     private String response; // La réponse correcte à la question
     private int points; // Le nombre de points attribués pour la réponse correcte
+    private String theme;
 
     
     public Question(int question_id, String question, List<String> choix, String response, int points, String theme) {
@@ -34,6 +35,7 @@ public class Question {
         this.response = response;
         this.points = points;
         this.choix = choix;
+        this.theme = theme;
     }
 
     /**
@@ -79,5 +81,9 @@ public class Question {
      */
     public int getPoints() {
         return points;
+    }
+
+    public String getTheme() {
+        return theme;
     }
 }
