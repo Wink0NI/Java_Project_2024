@@ -10,6 +10,15 @@ public class Question {
     private String response; // La réponse correcte à la question
     private int points; // Le nombre de points attribués pour la réponse correcte
 
+    
+    public Question(int question_id, String question, List<String> choix, String response, int points, String theme) {
+        this.question_id = question_id;
+        this.question = question;
+        this.response = response;
+        this.points = points;
+        this.choix = choix;
+    }
+
     /**
      * Constructeur pour créer une nouvelle instance de Question.
      *
@@ -18,9 +27,9 @@ public class Question {
      * @param choix Les choix possibles pour la réponse à la question
      * @param response La réponse correcte à la question
      * @param points Le nombre de points attribués pour la réponse correcte
+     * @param theme Theme de la question
      */
-    public Question(int question_id, String question, List<String> choix, String response, int points) {
-        this.question_id = question_id;
+    public Question(String question, List<String> choix, String response, int points, String theme) {
         this.question = question;
         this.response = response;
         this.points = points;
