@@ -3,26 +3,30 @@ import java.util.Scanner;
 
 import process.*;
 
+/**
+ * Cette classe gère l'interface de connexion pour le jeu "Question pour un champion".
+ */
 public class Interface_Connexion {
-    protected SysGestion gestion;
-    protected DBProcess dbProcess;
+    protected SysGestion gestion; // Gestion du système
+    protected DBProcess dbProcess; // Processus de base de données
 
-    protected Interface_Menu_Principal menu_Principal;
+    protected Interface_Menu_Principal menu_Principal; // Interface du menu principal
 
+    /**
+     * Constructeur pour initialiser une instance d'Interface_Connexion.
+     */
     public Interface_Connexion() {
-        dbProcess = new DBProcess(); // Initialize dbProcess here
+        dbProcess = new DBProcess(); // Initialiser dbProcess ici
         menu_Principal = new Interface_Menu_Principal();
-    }    
+    }
 
-    private Avatar joueur;
+    private Avatar joueur; // Avatar du joueur
     Scanner scanner = new Scanner(System.in);
 
-    
-
-
-
+    /**
+     * Affiche le menu de connexion et gère les actions de l'utilisateur.
+     */
     public void menu_connexion() {
-
         while (true) {
             gestion.clear();
 
@@ -47,15 +51,14 @@ public class Interface_Connexion {
                 default:
                     System.out.println("Commande saisie invalide...");
                     gestion.wait(1000);
-
             }
-            
-
         }
-
     }
 
-    private void processus_inscription() {
+    /**
+     * Gère le processus d'inscription d'un joueur.
+     */
+    public void processus_inscription() {
         System.out.println("Entrer le nom de votre avatar (VOUS NE POURREZ PLUS LE MODIFIER):");
         String avatar = scanner.next();
         System.out.println("Entrer votre mot de passe:");
@@ -73,21 +76,21 @@ public class Interface_Connexion {
         }
     }
 
-    private void processus_connexion() {
+    /**
+     * Gère le processus de connexion d'un joueur.
+     */
+    public void processus_connexion() {
         System.out.println("Entrer le nom de votre avatar:");
         String avatar = scanner.next();
         System.out.println("Entrer votre mot de passe:");
         String mdp = scanner.next();
 
-
         if (dbProcess.connecter(avatar, mdp)) {
             System.out.println(String.format("Connecxion réussi ! Vous êtes connecté en tant que %s.", avatar));
             gestion.wait(2000);
             menu_Principal.menu_principal(avatar);
-
         } 
         gestion.wait(2000);
     }
-
-
 }
+
