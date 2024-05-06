@@ -11,7 +11,7 @@ public class DBProcess {
     public void inscrire(Avatar avatar) { 
         
 
-        if (!findUserById(avatar.getName())) {
+        if (!isUser(avatar.getName())) {
             //String url = "jdbc:sqlite:BDD/BDD_MonstreDuSavoir.db";
             try {
                 Connection inscription_conn = DriverManager.getConnection(db_url);
@@ -32,7 +32,7 @@ public class DBProcess {
     }
 
     public boolean connecter(String username, String password) {
-        if (findUserById(username)) {
+        if (isUser(username)) {
             try {
                 Connection connexion_conn = DriverManager.getConnection(db_url);
                 Statement connexion_stmt = connexion_conn.createStatement();
@@ -60,16 +60,17 @@ public class DBProcess {
         return false;
     }
 
-    public boolean findUserById(String user_id) {
+    public boolean isUser(String user) {
         try {
-            Connection findUserById_conn = DriverManager.getConnection(db_url);
-            Statement findUserById_stmt = findUserById_conn.createStatement();
+            Connection isUser_conn = DriverManager.getConnection(db_url);
+            Statement isUser_stmt = isUser_conn.createStatement();
 
-            if (findUserById_stmt.executeQuery(String.format("SELECT name FROM Joueurs WHERE name = '%s'", user_id)).next()) {
-                findUserById_conn.close();
+
+            if (isUser_stmt.executeQuery(String.format("SELECT name FROM Joueurs WHERE name = '%s'", user)).next()) {
+                isUser_conn.close();
                 return true; // Return true if the user was found
             }
-            findUserById_conn.close();
+            isUser_conn.close();
         } 
         catch (SQLException e) {
             e.printStackTrace();
@@ -77,22 +78,25 @@ public class DBProcess {
         return false;
     }
 
-    public Avatar getUserById(String user_id) {
+    public Avatar getUser(String user_id) {
         try {
-            Connection findUserById_conn = DriverManager.getConnection(db_url);
-            Statement findUserById_stmt = findUserById_conn.createStatement();
+            Connection getUser_conn = DriverManager.getConnection(db_url);
+            Statement getUser_stmt = getUser_conn.createStatement();
 
-            ResultSet resp = findUserById_stmt.executeQuery(String.format("SELECT * FROM Joueurs WHERE name = '%s'", user_id));
+            ResultSet resp = getUser_stmt.executeQuery(String.format("SELECT * FROM Joueurs WHERE name = '%s'", user_id));
 
             if (resp.next()) {
-                findUserById_conn.close();
-                return new Avatar(resp.getString("user_id"), resp.getString("name"), resp.getString("mdp"), resp.getInt("pv")); // Return true if the user was found
+                Avatar avatar = new Avatar(resp.getString("user_id"), resp.getString("name"), resp.getString("mdp"), resp.getInt("pv"));
+                getUser_conn.close();
+                return  avatar;// Return true if the user was found
             }
-            findUserById_conn.close();
+            getUser_conn.close();
+            
         } 
         catch (SQLException e) {
             e.printStackTrace();
         }
+        
         return new Avatar();
     }
 
@@ -159,6 +163,64 @@ public class DBProcess {
             maj_pv_stmt.execute(String.format("UPDATE Joueurs SET pv = %s WHERE name='%s'", value, name));
 
             maj_pv_conn.close();
+
+
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean isAdmin(String name) {
+        try {
+            Connection isAdmin_conn = DriverManager.getConnection(db_url);
+            Statement isAdmin_stmt = isAdmin_conn.createStatement();
+
+            ResultSet resp = isAdmin_stmt.executeQuery(String.format("SELECT * FROM Joueurs j JOIN admin a ON j.user_id = a.user_id WHERE name = '%s'", name));
+
+            if (resp.next()) {
+                isAdmin_conn.close();
+                return  true;// Return true if the user was found
+            }
+            isAdmin_conn.close();
+            
+        } 
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return false;
+    }
+
+
+    public void addAdmin(String name) {
+        try {
+            Connection add_admin_conn = DriverManager.getConnection(db_url);
+            Statement add_admin_stmt = add_admin_conn.createStatement();
+            
+            Avatar user_Avatar = getUser(name);
+
+
+            add_admin_stmt.executeUpdate(String.format("INSERT INTO admin VALUES ('%s')", user_Avatar.getId()));
+
+            add_admin_conn.close();
+
+
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void removeAdmin(String name) {
+        try {
+            Connection add_admin_conn = DriverManager.getConnection(db_url);
+            Statement add_admin_stmt = add_admin_conn.createStatement();
+
+
+            add_admin_stmt.executeUpdate(String.format("DELETE FROM admin WHERE user_id = (SELECT user_id FROM Joueurs WHERE name = '%s')", name));
+
+            add_admin_conn.close();
 
 
         }

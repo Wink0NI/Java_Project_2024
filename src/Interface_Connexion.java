@@ -55,7 +55,7 @@ public class Interface_Connexion {
 
     }
 
-    public void processus_inscription() {
+    private void processus_inscription() {
         System.out.println("Entrer le nom de votre avatar (VOUS NE POURREZ PLUS LE MODIFIER):");
         String avatar = scanner.next();
         System.out.println("Entrer votre mot de passe:");
@@ -73,7 +73,7 @@ public class Interface_Connexion {
         }
     }
 
-    public void processus_connexion() {
+    private void processus_connexion() {
         System.out.println("Entrer le nom de votre avatar:");
         String avatar = scanner.next();
         System.out.println("Entrer votre mot de passe:");

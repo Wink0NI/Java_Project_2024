@@ -14,6 +14,7 @@ public class Interface_Jeu {
     }
 
     public void menu_jouer(String user) {
+        gestion.clear();
 
         while (true) {
             System.out.println("Modes de jeu");
@@ -37,7 +38,7 @@ public class Interface_Jeu {
         }
     }
 
-    public void defi_solo(String user) {
+    private void defi_solo(String user) {
         int nb_questions = Math.min(20, dbProcess.get_nb_questions());
 
         System.out.println("Défi solo");
@@ -57,7 +58,7 @@ public class Interface_Jeu {
             return;
         } else { // Le défi commence
             int score = 0;
-            int currentPV = dbProcess.getUserById(user).getPV();
+            int currentPV = dbProcess.getUser(user).getPV();
             List<Question> questions = dbProcess.generate_question(nb_questions);
 
             System.out.println("Défi solo");
