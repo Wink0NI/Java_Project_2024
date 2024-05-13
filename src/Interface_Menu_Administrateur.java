@@ -31,7 +31,7 @@ public class Interface_Menu_Administrateur {
 
             System.out.println("B - Retour au menu principal");
 
-            switch (scanner.next().toUpperCase()) {
+            switch (scanner.nextLine().toUpperCase()) {
                 case "A":
                     ajouter_question(user);
                     break;
@@ -60,21 +60,21 @@ public class Interface_Menu_Administrateur {
         System.out.println("Comment voulez-vous rajouter les questions ?");
         System.out.println("A - A la Main\nB - Par fichier texte/csv");
 
-        switch (scanner.next().toUpperCase()){
+        switch (scanner.nextLine().toUpperCase()){
             case "A":
                 System.out.println("Taper la question: ");
-                String question = scanner.next();
+                String question = scanner.nextLine();
                 
                 
                 System.out.println("Thème: ");
-                String theme_question = scanner.next();
+                String theme_question = scanner.nextLine();
                 
                 int nb = 2;
                 
                 while (true) {
                     System.out.println("Nombre de réponses: ");
                     try {
-                        nb = scanner.nextInt();
+                        nb = Integer.parseInt(scanner.nextLine());
 
                         if (nb < 2) {
                             System.out.println("Nombre invalide: Valeur insuffisante - 2 choix minimum.");
@@ -94,13 +94,18 @@ public class Interface_Menu_Administrateur {
                 List<String> Options_reponses = new ArrayList<>();
                 for (int i = 0; i < nb; i++) {
                     System.out.println(String.format("Choix %d", i+1));
-                        Options_reponses.add(scanner.next());
+                    String choix = scanner.nextLine();
+                    while (Options_reponses.contains(choix)) {
+                        System.out.println("Hop pop pop , vous avez deja ajouté ce choix dans votre liste ! ");
+                        choix = scanner.nextLine();
+                    }
+                    Options_reponses.add(choix);
                 }
                 System.out.println("Réponse: ");
-                String reponse = scanner.next();
+                String reponse = scanner.nextLine();
                 while(!Options_reponses.contains(reponse)){
                     System.out.println("Hop pop pop , vous n'avez pas mis ca comme reponses dans votre liste ! ");
-                    reponse = scanner.next();
+                    reponse = scanner.nextLine();
                 }
 
                 int nb_point = 2;
@@ -108,7 +113,7 @@ public class Interface_Menu_Administrateur {
                 while (true) {
                     System.out.println("Nombre de points gagnés: ");
                     try {
-                        nb_point = scanner.nextInt();
+                        nb_point = Integer.parseInt(scanner.nextLine());
 
                         if (nb_point < 0) {
                             System.out.println("Nombre invalide: Valeur insuffisante - 0 point minimum.");
@@ -142,7 +147,7 @@ public class Interface_Menu_Administrateur {
         System.out.println(
                 "----------------------------------------------------------------------------------------------------------------------");
         System.out.println("Ajouter un utilisateur.\nEntrez un nom: ");
-        String admin = scanner.next();
+        String admin = scanner.nextLine();
 
         if (!dbProcess.isUser(admin)) {
             System.out.println(String.format("ERROR: L'utilisateur %s n'existe pas.", admin));
@@ -161,7 +166,7 @@ public class Interface_Menu_Administrateur {
         System.out.println(
                 "----------------------------------------------------------------------------------------------------------------------");
         System.out.println("Retirer un utilisateur.\nEntrez un nom: ");
-        String admin = scanner.next();
+        String admin = scanner.nextLine();
 
         if (!dbProcess.isUser(admin)) {
             System.out.println(String.format("ERROR: L'utilisateur %s n'existe pas.", admin));

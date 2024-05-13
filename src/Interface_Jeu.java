@@ -20,7 +20,7 @@ public class Interface_Jeu {
             System.out.println("Modes de jeu");
             System.out.println("----------------");
             System.out.println("S - Commencer un défi solo\nR - Retour");
-            switch (scanner.next().toUpperCase()) {
+            switch (scanner.nextLine().toUpperCase()) {
                 case "S":
                     defi_solo(user);
                     break;
@@ -47,7 +47,7 @@ public class Interface_Jeu {
 
         while (true) {
             System.out.println(String.format("Choisissez le thème:\nThèmes:\n- Tout\n%s", dbProcess.getThemes()));
-            theme = scanner.next().toLowerCase();
+            theme = scanner.nextLine().toLowerCase();
             if (dbProcess.isTheme(theme) || theme.equals("tout")) {
                 if (theme.equals("tout")) theme = "";
                 break;
@@ -73,7 +73,7 @@ public class Interface_Jeu {
         
         System.out.println("Le jeu va commencer. Taper n'importe quoi pour débuter\nR - Annuler");
 
-        if (scanner.next().equals("R")) {
+        if (scanner.nextLine().toUpperCase().equals("R")) {
             return;
         } else { // Le défi commence
             int score = 0;
@@ -94,7 +94,7 @@ public class Interface_Jeu {
                     System.out.println((num_choix + 1) + " - " + question.getChoices().get(num_choix));
                 }
                 System.out.print("Réponse -> ");
-                String resp = scanner.next();
+                String resp = scanner.nextLine();
 
                 if (resp.equals(question.getResponse())) {
                     System.out.println("Bonne réponse !");
@@ -134,7 +134,7 @@ public class Interface_Jeu {
                     "-----------------------------------------------------------------------------------------------------------------------------------------------------------");
 
             System.out.println("Taper n'importe quoi pour quitter");
-            scanner.next();
+            scanner.nextLine();
 
         }
     }

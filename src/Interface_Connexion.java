@@ -35,7 +35,7 @@ public class Interface_Connexion {
             System.out.println("I - S'inscrire\nC - Se connecter\nQ - Quitter");
             System.out.print("-> ");
 
-            switch (scanner.next().toUpperCase()) {
+            switch (scanner.nextLine().toUpperCase()) {
                 case "Q":
                     System.out.println("Au revoir...");
                     System.exit(0);
@@ -60,11 +60,11 @@ public class Interface_Connexion {
      */
     public void processus_inscription() {
         System.out.println("Entrer le nom de votre avatar (VOUS NE POURREZ PLUS LE MODIFIER):");
-        String avatar = scanner.next();
+        String avatar = scanner.nextLine();
         System.out.println("Entrer votre mot de passe:");
-        String mdp = scanner.next();
+        String mdp = scanner.nextLine();
         System.out.println("Confirmer votre mot de passe:");
-        String mdp_verif = scanner.next();
+        String mdp_verif = scanner.nextLine();
 
         if (mdp.equals(mdp_verif)) {
             dbProcess.inscrire(new Avatar(avatar, mdp));
@@ -81,9 +81,9 @@ public class Interface_Connexion {
      */
     public void processus_connexion() {
         System.out.println("Entrer le nom de votre avatar:");
-        String avatar = scanner.next();
+        String avatar = scanner.nextLine();
         System.out.println("Entrer votre mot de passe:");
-        String mdp = scanner.next();
+        String mdp = scanner.nextLine();
 
         if (dbProcess.connecter(avatar, mdp)) {
             System.out.println(String.format("Connecxion réussi ! Vous êtes connecté en tant que %s.", avatar));

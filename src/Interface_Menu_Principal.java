@@ -30,7 +30,7 @@ public class Interface_Menu_Principal  {
             }
 
             System.out.println("D - Se déconnecter");
-            switch (scanner.next().toUpperCase()) {
+            switch (scanner.nextLine().toUpperCase()) {
                 case "J":
                     jeu.menu_jouer(user);
                     break;
