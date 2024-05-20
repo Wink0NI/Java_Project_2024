@@ -62,7 +62,7 @@ public class Interface_Menu_Principal {
             if (defis.size() == 0 && resultat_defi.size() == 0)
                 System.out.println("Rien à signaler.");
 
-            if (resultat_defi.size() == 0) {
+            if (resultat_defi.size() > 0) {
                 for (HashMap<String, String> defi : resultat_defi) {
                     if (defi.get("vainqueur").equals(user_id)) {
                         System.out.println(
@@ -90,7 +90,7 @@ public class Interface_Menu_Principal {
                     }
                 }
             }
-            if (defis.size() == 0) {
+            if (defis.size() > 0) {
                 Timestamp tps = new Timestamp(System.currentTimeMillis());
                 for (HashMap<String, Object> duel : defis) {
                     if (tps.before((Timestamp) duel.get("temps_limite"))) {
