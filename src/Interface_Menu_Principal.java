@@ -12,38 +12,13 @@ public class Interface_Menu_Principal {
 
     public Interface_Menu_Principal() {
         dbProcess = new DBProcess();
+        gestion = new SysGestion();
     }
 
     private Interface_Jeu jeu = new Interface_Jeu();
     private Interface_Menu_Administrateur admin = new Interface_Menu_Administrateur();
 
-    private String afficherTempsRestant(Timestamp tps) {
-
-        long temps_restant = tps.getTime() - System.currentTimeMillis();
-
-        long jours = temps_restant / (24 * 60 * 60 * 1000);
-        long heures = (temps_restant % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000);
-        long minutes = (temps_restant % (60 * 60 * 1000)) / (60 * 1000);
-        long secondes = (temps_restant % (60 * 1000)) / 1000;
-
-        String jours_str = jours == 1 ? String.valueOf(jours) + " jour" : String.valueOf(jours) + " jours";
-        String heures_str = heures == 1 ? String.valueOf(heures) + " heure" : String.valueOf(heures) + " heures";
-        String minutes_str = minutes == 1 ? String.valueOf(minutes) + " minute" : String.valueOf(minutes) + " minutes";
-        String secondes_str = secondes == 1 ? String.valueOf(secondes) + " seconde"
-                : String.valueOf(secondes) + " secondes";
-
-        List<String> heures_list = new ArrayList<String>();
-        if (jours > 0)
-            heures_list.add(jours_str);
-        if (heures > 0)
-            heures_list.add(heures_str);
-        if (minutes > 0)
-            heures_list.add(minutes_str);
-        if (secondes > 0)
-            heures_list.add(secondes_str);
-
-        return String.join(" ", heures_list);
-    }
+    
 
     public void menu_principal(String user_id) {
 
@@ -97,7 +72,7 @@ public class Interface_Menu_Principal {
                         System.out.println(
                                 String.format("- %s veut te défier: %s restant.",
                                         dbProcess.getUserById((String) duel.get("user_atq")).getName(),
-                                        afficherTempsRestant((Timestamp) duel.get("temps_limite"))));
+                                        gestion.afficherTempsRestant((Timestamp) duel.get("temps_limite"))));
 
                     } else {
                         int point_perdus = (int) duel.get("score_atq");

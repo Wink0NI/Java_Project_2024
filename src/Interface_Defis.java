@@ -1,55 +1,127 @@
 import process.SysGestion;
 import java.util.Scanner;
 import java.util.List;
+import java.util.HashMap;
+import java.sql.*;
 
-public class Interface_Jeu {
+public class Interface_Defis {
 
     Scanner scanner = new Scanner(System.in);
     private SysGestion gestion;
 
     protected DBProcess dbProcess;
 
-    protected Interface_Defis interface_Defis; // Interface du menu principal
-
-    public Interface_Jeu() {
+    public Interface_Defis() {
         dbProcess = new DBProcess(); // Initialize dbProcess here
-        interface_Defis = new Interface_Defis(); //
+        gestion = new SysGestion();
     }
 
-    public void menu_jouer(String user_id) {
+    public void menu_Defis(String user_id) {
 
         while (true) {
             Avatar user = dbProcess.getUserById(user_id);
+            List<HashMap<String, Object>> defis = dbProcess.get_duels(user_id);
+
+            List<HashMap<String, String>> resultat_defi = dbProcess.get_duels_resultat(user_id);
+
             gestion.clear();
 
-            System.out.println("Modes de jeu");
-            System.out.println("----------------");
-            System.out.println("S - Commencer un défi solo");
-            System.out.println("D - Défier un jouer");
-            System.out.println("F - Défis");
+            System.out.println("Menu des défis");
 
+            if (resultat_defi.size() > 0) {
+                System.out.println(
+                        "----------------------------------------------------------------------------------------------------------------------");
+                System.out.println(
+                        "NOTIFICATIONS");
+                for (HashMap<String, String> defi : resultat_defi) {
+                    if (defi.get("vainqueur").equals(user_id)) {
+                        System.out.println(
+                                String.format(
+                                        "%s a accepté ton défi, mais il n'a pas eu suffisament de puissance pour te dominer. Bravo !!!",
+                                        defi.get("user_cible"))
+
+                        );
+                        dbProcess.updateStatsVictoire(user_id, defi.get("duel_id"));
+                    } else if (defi.get("vainqueur").equals("Aucune")) {
+                        System.out.println(
+                                String.format(
+                                        "%s a accepté ton défi, et il a eu suffisament de point pour ne pas perdre.",
+                                        defi.get("user_cible"))
+
+                        );
+                    } else {
+                        System.out.println(
+                                String.format(
+                                        "%s a accepté ton défi, et il a pas eu suffisament de puissance pour te dominer. Dommage !!!",
+                                        defi.get("user_cible"))
+
+                        );
+                        dbProcess.updateStatsVictoire(user_id, defi.get("duel_id"));
+                    }
+                }
+            }
+            System.out.println(
+                    "----------------------------------------------------------------------------------------------------------------------");
+
+            if (defis.size() == 0) {
+                System.out.println("Aucun défi pour vous, revenez plus tard...");
+                gestion.wait(3000);
+                return;
+            }
+
+            if (defis.size() > 0) {
+                Timestamp tps = new Timestamp(System.currentTimeMillis());
+                int cpt = 1;
+                for (HashMap<String, Object> duel : defis) {
+                    if (tps.before((Timestamp) duel.get("temps_limite"))) {
+                        System.out.println(
+                                String.format("%d - %s veut te défier: %s restant.",
+                                        cpt,
+                                        dbProcess.getUserById((String) duel.get("user_atq")).getName(),
+                                        gestion.afficherTempsRestant((Timestamp) duel.get("temps_limite"))));
+
+                    } else {
+                        int point_perdus = (int) duel.get("score_atq");
+
+                        System.out.println(
+                                String.format(
+                                        "- %s voulait te défier, mais le temps est écoulé... Tu as perdu %d points.",
+                                        dbProcess.getUserById((String) duel.get("user_atq")).getName(),
+                                        point_perdus));
+
+                        dbProcess.updatePV(user_id, user.getPV() - point_perdus <= 0 ? 0 : user.getPV() - point_perdus);
+                        dbProcess.updateStatsOubli((String) duel.get("user_atq"), user_id,
+                                (String) duel.get("duel_id"));
+
+                        System.out.println("Appuyer sur Entrée pour continuer...");
+                        scanner.nextLine();
+
+                    }
+                }
+            }
             System.out.println("R - Retour");
-            switch (scanner.nextLine().toUpperCase()) {
-                case "S":
-                    defi_solo(user);
-                    break;
+            try {
+                String choix_defi = scanner.nextLine();
 
-                case "D":
-                    defi(user);
-                    break;
-
-                case "F":
-                interface_Defis.menu_Defis(user_id);
-                    break;
-
-                case "R":
+                if (choix_defi.toUpperCase().equals("R")) {
                     System.out.println("Retour au menu principal.");
                     gestion.wait(2000);
                     return;
-
-                default:
+                }
+                
+                if (0 < Integer.parseInt(choix_defi) && defis.size() >= Integer.parseInt(choix_defi)) {
+                    System.out.println("Le nombre est ok ");
+                    gestion.wait(2000);
+                }
+                    
+                else {
                     System.out.println("Commande saisie invalide...");
                     gestion.wait(2000);
+                }
+
+            } catch (Exception e) {
+                System.out.println("ERREUR: Nombre invalide...");
+                gestion.wait(2000);
             }
 
         }
