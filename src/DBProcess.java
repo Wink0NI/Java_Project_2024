@@ -1,6 +1,8 @@
 import java.sql.*;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.UUID;
+import java.util.HashMap;
 
 public class DBProcess {
 
@@ -144,6 +146,21 @@ public class DBProcess {
         return nb_questions;
     }
 
+    public void updatePV(String user_id, int value) {
+
+        try {
+            Connection maj_pv_conn = DriverManager.getConnection(db_url);
+            Statement maj_pv_stmt = maj_pv_conn.createStatement();
+
+            maj_pv_stmt.execute(String.format("UPDATE Joueurs SET pv = %s WHERE user_id='%s'", value, user_id));
+
+            maj_pv_conn.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public List<Question> generate_question(int nb_questions_totales, String th) {
         List<Question> questions = new ArrayList<Question>();
 
@@ -183,15 +200,280 @@ public class DBProcess {
         return questions;
     }
 
-    public void updatePV(String user_id, int value) {
+    public List<Question> get_question_duel(String duel_id, String atq) {
+        List<Question> questions = new ArrayList<Question>();
+
+        atq = getUserByName(atq).getId();
 
         try {
-            Connection maj_pv_conn = DriverManager.getConnection(db_url);
-            Statement maj_pv_stmt = maj_pv_conn.createStatement();
+            Connection get_question_duel_conn = DriverManager.getConnection(db_url);
+            Statement get_question_duel_stmt = get_question_duel_conn.createStatement();
 
-            maj_pv_stmt.execute(String.format("UPDATE Joueurs SET pv = %s WHERE user_id='%s'", value, user_id));
+            ResultSet resultat = get_question_duel_stmt.executeQuery(String
+                    .format("SELECT * FROM duel d JOIN Questions_duel qd ON d.duel_id = qd.duel_id JOIN Questions q ON q.question_id = qd.question_id WHERE user_atq = '%s' ORDER BY RANDOM()",
+                            atq));
 
-            maj_pv_conn.close();
+            while (resultat.next()) {
+
+                int id = resultat.getInt("q.question_id");
+                String texte = resultat.getString("question");
+                int val = resultat.getInt("point");
+                List<String> choix = new ArrayList<String>();
+                choix.add(resultat.getString("choix1"));
+                choix.add(resultat.getString("choix2"));
+                if (resultat.getString("choix3") != null)
+                    choix.add(resultat.getString("choix3"));
+                if (resultat.getString("choix4") != null)
+                    choix.add(resultat.getString("choix4"));
+                String reponse = resultat.getString("response");
+                String theme = resultat.getString("theme");
+
+                questions.add(new Question(id, texte, choix, reponse, val, theme));
+
+            }
+            get_question_duel_conn.close();
+            return questions;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return questions;
+    }
+
+    public HashMap<String, Object> get_duel(String duel_id) {
+
+        try {
+            Connection get_duel_conn = DriverManager.getConnection(db_url);
+            Statement get_duel_stmt = get_duel_conn.createStatement();
+
+            ResultSet resultat = get_duel_stmt.executeQuery(String
+                    .format("SELECT * FROM duel WHERE duel_id = '%s'",
+                            duel_id));
+
+            if (resultat.next()) {
+                HashMap<String, Object> line = new HashMap<>();
+                line.put("duel_id", resultat.getString("duel_id"));
+                line.put("user_atq", resultat.getString("user_atq"));
+                line.put("temps_limite", resultat.getTimestamp("temps_limite"));
+                line.put("score_atq", resultat.getInt("score_atq"));
+
+                get_duel_conn.close();
+                return line;
+
+            }
+            get_duel_conn.close();
+            return null;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public List<HashMap<String, String>> get_duels_resultat(String attaquant) {
+        List<HashMap<String, String>> duels = new ArrayList<>();
+
+        try {
+            Connection get_duels_resultat_conn = DriverManager.getConnection(db_url);
+            Statement get_duels_resultat_stmt = get_duels_resultat_conn.createStatement();
+
+            ResultSet resultat = get_duels_resultat_stmt.executeQuery(String
+                    .format("SELECT * FROM duel WHERE user_atq = '%s' AND vainqueur IS NOT NULL",
+                            attaquant));
+
+            while (resultat.next()) {
+                HashMap<String, String> line = new HashMap<>();
+                line.put("duel_id", resultat.getString("duel_id"));
+                line.put("user_cible", resultat.getString("user_cible"));
+                line.put("vainqueur", resultat.getString("vainqueur"));
+
+                duels.add(line);
+
+            }
+            get_duels_resultat_conn.close();
+
+            for (HashMap<String, String> duel : duels) {
+                removeQuestionDuel(duel.get("duel_id"));
+            }
+            return duels;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return duels;
+    }
+
+    public List<HashMap<String, Object>> get_duels(String cible) {
+        List<HashMap<String, Object>> duels = new ArrayList<>();
+
+        try {
+            Connection get_duel_conn = DriverManager.getConnection(db_url);
+            Statement get_duel_stmt = get_duel_conn.createStatement();
+
+            ResultSet resultat = get_duel_stmt.executeQuery(String
+                    .format("SELECT * FROM duel WHERE user_cible = '%s' ORDER BY temps_limite",
+                            cible));
+
+            while (resultat.next()) {
+                HashMap<String, Object> line = new HashMap<>();
+                line.put("duel_id", resultat.getString("duel_id"));
+                line.put("user_atq", resultat.getString("user_atq"));
+                line.put("temps_limite", resultat.getTimestamp("temps_limite"));
+
+                duels.add(line);
+
+            }
+            get_duel_conn.close();
+            return duels;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return duels;
+    }
+
+    public void addQuestion(Question question) {
+
+        try {
+            Connection addQuestion_conn = DriverManager.getConnection(db_url);
+            Statement addQuestion_stmt = addQuestion_conn.createStatement();
+
+            String choix3 = "";
+            String choix4 = "";
+
+            if (question.getChoices().size() < 3)
+                choix3 = "NULL";
+            else
+                choix3 = "'" + question.getChoices().get(2) + "'";
+
+            if (question.getChoices().size() < 4)
+                choix4 = "NULL";
+            else
+                choix4 = "'" + question.getChoices().get(3) + "'";
+
+            String requete_sql = String.format(
+                    "INSERT INTO Questions (question, point, choix1, choix2, choix3, choix4, response, theme) VALUES ('%s','%s', '%s','%s',%s, %s,'%s','%s')",
+                    question.getQuestion(), question.getPoints(), question.getChoices().get(0),
+                    question.getChoices().get(1), choix3, choix4, question.getResponse(), question.getTheme());
+            addQuestion_stmt.executeUpdate(requete_sql);
+            addQuestion_conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        }
+    }
+
+    public void addQuestion(List<Question> questions) {
+
+        try {
+            Connection addQuestion_conn = DriverManager.getConnection(db_url);
+            Statement addQuestion_stmt = addQuestion_conn.createStatement();
+            String valeurs = "";
+
+            for (Question question : questions) {
+                String choix3 = "";
+                String choix4 = "";
+
+                if (question.getChoices().size() < 3)
+                    choix3 = "NULL";
+                else
+                    choix3 = "'" + question.getChoices().get(2) + "'";
+
+                if (question.getChoices().size() < 4)
+                    choix4 = "NULL";
+                else
+                    choix4 = "'" + question.getChoices().get(3) + "'";
+
+                valeurs += String.format("('%s','%s', '%s','%s',%s, %s,'%s','%s'),", question.getQuestion(),
+                        question.getPoints(), question.getChoices().get(0), question.getChoices().get(1), choix3,
+                        choix4, question.getResponse(), question.getTheme());
+            }
+
+            valeurs = valeurs.substring(0, valeurs.length() - 1);
+            String requete_sql = String.format(
+                    "INSERT INTO Questions (question, point, choix1, choix2, choix3, choix4, response, theme) VALUES %s",
+                    valeurs);
+            addQuestion_stmt.executeUpdate(requete_sql);
+
+            addQuestion_conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        }
+    }
+
+    public void addQuestionDuel(List<Question> questions, String user_atq, String user_cible, int score_atq,
+            int nb_jours) {
+
+        try {
+            Connection addQuestionDuel_conn = DriverManager.getConnection(db_url);
+            Statement addQuestionDuel_stmt = addQuestionDuel_conn.createStatement();
+            String valeurs = "";
+
+            String duel_id = UUID.randomUUID().toString();
+            while (isDuel(duel_id))
+                duel_id = UUID.randomUUID().toString();
+
+            for (Question question : questions) {
+                valeurs += String.format("('%s','%s'),", duel_id, question.getId());
+            }
+
+            valeurs = valeurs.substring(0, valeurs.length() - 1);
+            String requete_sql = String.format(
+                    "INSERT INTO Questions_duel (duel_id, question_id) VALUES %s; INSERT INTO duel VALUES ('%s','%s', '%s', '%s', %d)",
+                    valeurs, duel_id, user_atq, user_cible,
+                    new Timestamp(System.currentTimeMillis() + 24 * 60 * 60 * 1000 * nb_jours), score_atq);
+            addQuestionDuel_stmt.executeUpdate(requete_sql);
+
+            addQuestionDuel_conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        }
+    }
+
+    public boolean isQuestion(String question) {
+        try {
+            Connection isQuestion_conn = DriverManager.getConnection(db_url);
+            Statement isQuestion_stmt = isQuestion_conn.createStatement();
+
+            ResultSet resp = isQuestion_stmt
+                    .executeQuery(String.format("SELECT question FROM Questions WHERE question = '%s'", question));
+
+            if (resp.next()) {
+                isQuestion_conn.close();
+                return true;
+            }
+            isQuestion_conn.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    public void removeQuestion(String question) {
+        try {
+            Connection removeQuestion_conn = DriverManager.getConnection(db_url);
+            Statement removeQuestion_stmt = removeQuestion_conn.createStatement();
+
+            removeQuestion_stmt.executeUpdate(String
+                    .format("DELETE FROM Questions WHERE question = '%s'", question));
+
+            removeQuestion_conn.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void removeQuestionDuel(String duel_id) {
+        try {
+            Connection removeQuestionDuel_conn = DriverManager.getConnection(db_url);
+            Statement removeQuestionDuel_stmt = removeQuestionDuel_conn.createStatement();
+
+            removeQuestionDuel_stmt.executeUpdate(String
+                    .format("DELETE FROM duel WHERE duel_id = '%s'; DELETE FROM Questions_duel WHERE duel_id = '%s';",
+                            duel_id, duel_id));
+
+            removeQuestionDuel_conn.close();
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -296,76 +578,6 @@ public class DBProcess {
         return res;
     }
 
-    public void addQuestion(Question question) {
-
-        try {
-            Connection addQuestion_conn = DriverManager.getConnection(db_url);
-            Statement addQuestion_stmt = addQuestion_conn.createStatement();
-
-            String choix3 = "";
-            String choix4 = "";
-
-            if (question.getChoices().size() < 3)
-                choix3 = "NULL";
-            else
-                choix3 = "'" + question.getChoices().get(2) + "'";
-
-            if (question.getChoices().size() < 4)
-                choix4 = "NULL";
-            else
-                choix4 = "'" + question.getChoices().get(3) + "'";
-
-            String requete_sql = String.format(
-                    "INSERT INTO Questions (question, point, choix1, choix2, choix3, choix4, response, theme) VALUES ('%s','%s', '%s','%s',%s, %s,'%s','%s')",
-                    question.getQuestion(), question.getPoints(), question.getChoices().get(0),
-                    question.getChoices().get(1), choix3, choix4, question.getResponse(), question.getTheme());
-            addQuestion_stmt.executeUpdate(requete_sql);
-            addQuestion_conn.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-
-        }
-    }
-
-    public void addQuestion(List<Question> questions) {
-
-        try {
-            Connection addQuestion_conn = DriverManager.getConnection(db_url);
-            Statement addQuestion_stmt = addQuestion_conn.createStatement();
-            String valeurs = "";
-
-            for (Question question : questions) {
-                String choix3 = "";
-                String choix4 = "";
-
-                if (question.getChoices().size() < 3)
-                    choix3 = "NULL";
-                else
-                    choix3 = "'" + question.getChoices().get(2) + "'";
-
-                if (question.getChoices().size() < 4)
-                    choix4 = "NULL";
-                else
-                    choix4 = "'" + question.getChoices().get(3) + "'";
-
-                valeurs += String.format("('%s','%s', '%s','%s',%s, %s,'%s','%s'),", question.getQuestion(),
-                        question.getPoints(), question.getChoices().get(0), question.getChoices().get(1), choix3,
-                        choix4, question.getResponse(), question.getTheme());
-            }
-
-            valeurs = valeurs.substring(0, valeurs.length() - 1);
-            String requete_sql = String.format(
-                    "INSERT INTO Questions (question, point, choix1, choix2, choix3, choix4, response, theme) VALUES %s",
-                    valeurs);
-            addQuestion_stmt.executeUpdate(requete_sql);
-
-            addQuestion_conn.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-
-        }
-    }
-
     public ResultSet getStat(String user_id) {
         try {
             Connection getStat_conn = DriverManager.getConnection(db_url);
@@ -398,16 +610,21 @@ public class DBProcess {
                 switch (type_defi) {
                     case "solo":
                         stats = String.format(
-                            "tot_question_defi_solo = tot_question_defi_solo + %d, jus_question_defi_solo = jus_question_defi_solo + %d, pt_gagne_defi_solo = pt_gagne_defi_solo + %d, pt_perdu_defi_solo = pt_perdu_defi_solo + %d, defi_solo = defi_solo + 1",
-                            questions, question_juste, pt_gagne, pt_perdu);
+                                "tot_question_defi_solo = tot_question_defi_solo + %d, jus_question_defi_solo = jus_question_defi_solo + %d, pt_gagne_defi_solo = pt_gagne_defi_solo + %d, pt_perdu_defi_solo = pt_perdu_defi_solo + %d, defi_solo = defi_solo + 1",
+                                questions, question_juste, pt_gagne, pt_perdu);
+                        break;
+
+                    case "vs":
+                        stats = String.format(
+                                "tot_question_defi_vs = tot_question_defi_vs + %d, jus_question_defi_vs = jus_question_defi_vs + %d, pt_gagne_defi_vs = pt_gagne_defi_vs + %d, pt_perdu_defi_vs = pt_perdu_defi_vs + %d, defi_vs = defi_vs + 1",
+                                questions, question_juste, pt_gagne, pt_perdu);
                         break;
 
                     default:
                         break;
                 }
 
-                updateStats_stmt
-                        .executeUpdate(String.format("UPDATE Stats SET %s WHERE user_id = '%s'", stats, user_id));
+                updateStats_stmt.execute(String.format("UPDATE Stats SET %s WHERE user_id = '%s'", stats, user_id));
 
                 updateStats_conn.close();
 
@@ -418,19 +635,76 @@ public class DBProcess {
         }
     }
 
-    public boolean isQuestion(String question) {
-        try {
-            Connection isQuestion_conn = DriverManager.getConnection(db_url);
-            Statement isQuestion_stmt = isQuestion_conn.createStatement();
+    public void updateStatsOubli(String user_atq, String user_cible, String duel_id) {
 
-            ResultSet resp = isQuestion_stmt
-                    .executeQuery(String.format("SELECT question FROM Questions WHERE question = '%s'", question));
+        try {
+            Connection updateStatsOubli_conn = DriverManager.getConnection(db_url);
+            Statement updateStatsOubli_stmt = updateStatsOubli_conn.createStatement();
+
+            updateStatsOubli_stmt.execute(
+                    String.format("UPDATE Stats SET oubli_vs = oubli_vs + 1 WHERE user_id = '%s'", user_cible));
+
+            updateStatsOubli_conn.close();
+
+            updateStatsVictoire(user_atq, duel_id);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void updateStatsVictoire(String user_atq, String duel_id) {
+
+        try {
+            Connection updateStatsVictoire_conn = DriverManager.getConnection(db_url);
+            Statement updateStatsVictoire_stmt = updateStatsVictoire_conn.createStatement();
+
+            updateStatsVictoire_stmt.execute(
+                    String.format("UPDATE Stats SET victoire_vs = victoire_vs + 1, match_vs = match_vs + 1 WHERE user_id = '%s'", user_atq));
+
+            updateStatsVictoire_conn.close();
+
+            removeQuestionDuel(duel_id);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void updateStatsDefaite(String user_atq, String duel_id) {
+
+        try {
+            Connection updateStatsDefaite_conn = DriverManager.getConnection(db_url);
+            Statement updateStatsDefaite_stmt = updateStatsDefaite_conn.createStatement();
+
+            updateStatsDefaite_stmt.execute(
+                    String.format("UPDATE Stats SET defaite_vs = defaite_vs + 1, match_vs = match_vs + 1 WHERE user_id = '%s'", user_atq));
+
+            updateStatsDefaite_conn.close();
+
+            removeQuestionDuel(duel_id);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public boolean isDuel(String duel_id) {
+        try {
+            Connection isDuel_conn = DriverManager.getConnection(db_url);
+            Statement isDuel_stmt = isDuel_conn.createStatement();
+
+            ResultSet resp = isDuel_stmt
+                    .executeQuery(String.format("SELECT * FROM duel WHERE duel_id = '%s'", duel_id));
 
             if (resp.next()) {
-                isQuestion_conn.close();
+                isDuel_conn.close();
                 return true;
             }
-            isQuestion_conn.close();
+            isDuel_conn.close();
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -438,21 +712,5 @@ public class DBProcess {
 
         return false;
     }
-
-    public void removeQuestion(String question) {
-        try {
-            Connection removeQuestion_conn = DriverManager.getConnection(db_url);
-            Statement removeQuestion_stmt = removeQuestion_conn.createStatement();
-
-            removeQuestion_stmt.executeUpdate(String
-                    .format("DELETE FROM Questions WHERE question = '%s'", question));
-
-            removeQuestion_conn.close();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
 
 }

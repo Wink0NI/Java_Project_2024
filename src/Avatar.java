@@ -8,6 +8,7 @@ public class Avatar {
     private String name; // Nom de l'avatar
     private String mdp; // Mot de passe de l'avatar
     private int pv; // Points de vie de l'avatar
+    private DBProcess dbProcess;
 
     /**
      * Constructeur pour créer un nouvel avatar avec un nom et un mot de passe.
@@ -16,6 +17,8 @@ public class Avatar {
      */
     public Avatar(String name, String mdp ) {
         this.id  = UUID.randomUUID().toString(); // Génère un identifiant unique pour l'avatar.
+        while (!dbProcess.isUser(this.id)) this.id = UUID.randomUUID().toString();
+            
         this.name = name; // Initialise le nom de l'avatar avec la valeur passée en paramètre.
         this.mdp = mdp; // Initialise le mot de passe de l'avatar avec la valeur passée en paramètre.
         this.pv = 0; // Initialise les points de vie de l'avatar à 0.
