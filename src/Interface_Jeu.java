@@ -13,10 +13,12 @@ public class Interface_Jeu {
         dbProcess = new DBProcess(); // Initialize dbProcess here
     }
 
-    public void menu_jouer(String user) {
-        gestion.clear();
+    public void menu_jouer(String user_id) {
 
         while (true) {
+            Avatar user = dbProcess.getUserById(user_id);
+            gestion.clear();
+
             System.out.println("Modes de jeu");
             System.out.println("----------------");
             System.out.println("S - Commencer un défi solo\nR - Retour");
@@ -38,8 +40,8 @@ public class Interface_Jeu {
         }
     }
 
-    private void defi_solo(String user) {
-        
+    private void defi_solo(Avatar user) {
+
         String theme = "";
         System.out.println("Défi solo");
         System.out.println(
@@ -49,19 +51,20 @@ public class Interface_Jeu {
             System.out.println(String.format("Choisissez le thème:\nThèmes:\n- Tout\n%s", dbProcess.getThemes()));
             theme = scanner.nextLine().toLowerCase();
             if (dbProcess.isTheme(theme) || theme.equals("tout")) {
-                if (theme.equals("tout")) theme = "";
+                if (theme.equals("tout"))
+                    theme = "";
                 break;
             }
 
             System.out.println(String.format("Le thème %s n'esiste pas", theme));
             gestion.wait(1000);
 
-
         }
-        
+
         int nb_questions = Math.min(20, dbProcess.get_nb_questions(theme));
+        
         System.out.println(
-            "-----------------------------------------------------------------------------------------------------------------------------------------------------------");
+                "-----------------------------------------------------------------------------------------------------------------------------------------------------------");
         System.out.println(String.format("Tu devras répondre à une série de %s questions.", nb_questions));
         System.out.println("Les questions auquelles tu répondras correctement seront ajoutées dans ton cerveau !");
         System.out.println(
@@ -70,21 +73,23 @@ public class Interface_Jeu {
                 "Cependant, n'oublie pas que chaque question te fera gagner ou perdre du savoir ! Le résultat du défi ne sera qu'un bonus/malus sur ton savoir !");
         System.out.println(
                 "-----------------------------------------------------------------------------------------------------------------------------------------------------------");
-        
+
         System.out.println("Le jeu va commencer. Taper n'importe quoi pour débuter\nR - Annuler");
 
         if (scanner.nextLine().toUpperCase().equals("R")) {
             return;
         } else { // Le défi commence
             int score = 0;
-            int currentPV = dbProcess.getUser(user).getPV();
+            int currentPV = user.getPV();
+            int pt_gagne = 0;
+            int pt_perdu = 0;
+
             List<Question> questions = dbProcess.generate_question(nb_questions, theme);
 
             System.out.println("Défi solo");
 
             for (int i = 0; i < nb_questions; i++) {
                 Question question = questions.get(i);
-
 
                 System.out.println(
                         "-----------------------------------------------------------------------------------------------------------------------------------------------------------");
@@ -99,7 +104,7 @@ public class Interface_Jeu {
                 if (resp.equals(question.getResponse())) {
                     System.out.println("Bonne réponse !");
                     score++;
-
+                    pt_gagne += question.getPoints();
                     currentPV += question.getPoints();
                 } else {
                     System.out.println("Faux ! Réponse correcte: " + question.getResponse());
@@ -108,6 +113,7 @@ public class Interface_Jeu {
                     } else {
                         currentPV -= question.getPoints();
                     }
+                    pt_perdu += question.getPoints();
 
                     gestion.wait(2000);
                 }
@@ -116,7 +122,8 @@ public class Interface_Jeu {
             System.out.println(
                     "-----------------------------------------------------------------------------------------------------------------------------------------------------------");
             int changement_val_savoir = score - (nb_questions / 2);
-            dbProcess.updatePV(user, changement_val_savoir);
+            dbProcess.updatePV(user.getId(), currentPV + changement_val_savoir);
+            dbProcess.updateStats(user.getId(), nb_questions, score, "solo", pt_gagne, pt_perdu);
 
             System.out.println("Résultat du défi: " + score + "/" + nb_questions);
             if (score > (nb_questions / 2)) {

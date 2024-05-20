@@ -31,6 +31,7 @@ public class Interface_Connexion {
             gestion.clear();
 
             System.out.println("Vous jouez en ce moment à Question pour un champion: ");
+            
             System.out.println("---------------------------------------------------");
             System.out.println("I - S'inscrire\nC - Se connecter\nQ - Quitter");
             System.out.print("-> ");
@@ -88,7 +89,9 @@ public class Interface_Connexion {
         if (dbProcess.connecter(avatar, mdp)) {
             System.out.println(String.format("Connecxion réussi ! Vous êtes connecté en tant que %s.", avatar));
             gestion.wait(2000);
-            menu_Principal.menu_principal(avatar);
+
+            
+            menu_Principal.menu_principal(dbProcess.getUserByName(avatar).getId());
         } 
         gestion.wait(2000);
     }
