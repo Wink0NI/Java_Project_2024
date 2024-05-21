@@ -24,7 +24,7 @@ public class Interface_Defis {
 
             List<HashMap<String, String>> resultat_defi = dbProcess.get_duels_resultat(user_id);
 
-            gestion.clear();
+      
 
             System.out.println("Menu des défis");
 
@@ -41,7 +41,7 @@ public class Interface_Defis {
                                         defi.get("user_cible"))
 
                         );
-                        dbProcess.updateStatsVictoire(user_id, defi.get("duel_id"));
+                        dbProcess.updateStatsVictoire(user_id, defi.get("duel_id"), true);
                     } else if (defi.get("vainqueur").equals("Aucune")) {
                         System.out.println(
                                 String.format(
@@ -56,7 +56,7 @@ public class Interface_Defis {
                                         defi.get("user_cible"))
 
                         );
-                        dbProcess.updateStatsVictoire(user_id, defi.get("duel_id"));
+                        dbProcess.updateStatsDefaite(user_id, defi.get("duel_id"), true);
                     }
                 }
             }
@@ -108,12 +108,12 @@ public class Interface_Defis {
                     gestion.wait(2000);
                     return;
                 }
-                
+
                 if (0 < Integer.parseInt(choix_defi) && defis.size() >= Integer.parseInt(choix_defi)) {
-                    System.out.println("Le nombre est ok ");
+                    defi_vs(user, defis.get(Integer.parseInt(choix_defi) - 1));
                     gestion.wait(2000);
                 }
-                    
+
                 else {
                     System.out.println("Commande saisie invalide...");
                     gestion.wait(2000);
@@ -127,28 +127,16 @@ public class Interface_Defis {
         }
     }
 
-    private void defi_solo(Avatar user) {
+    private void defi_vs(Avatar user, HashMap<String, Object> defi) {
 
         String theme = "";
-        System.out.println("Défi solo");
-        System.out.println(
-                "-----------------------------------------------------------------------------------------------------------------------------------------------------------");
+        System.out.println("Défi vs");
 
-        while (true) {
-            System.out.println(String.format("Choisissez le thème:\nThèmes:\n- Tout\n%s", dbProcess.getThemes()));
-            theme = scanner.nextLine().toLowerCase();
-            if (dbProcess.isTheme(theme) || theme.equals("tout")) {
-                if (theme.equals("tout"))
-                    theme = "";
-                break;
-            }
-
-            System.out.println(String.format("Le thème %s n'esiste pas", theme));
-            gestion.wait(1000);
-
-        }
-
-        int nb_questions = Math.min(20, dbProcess.get_nb_questions(theme));
+        
+        List<Question> questions = dbProcess.get_question_duel((String) defi.get("duel_id"));
+        
+        int nb_questions = questions.size();
+        Avatar atq_avatar = dbProcess.getUserById((String) defi.get("user_atq"));
 
         System.out.println(
                 "-----------------------------------------------------------------------------------------------------------------------------------------------------------");
@@ -156,8 +144,11 @@ public class Interface_Defis {
         System.out.println("Les questions auquelles tu répondras correctement seront ajoutées dans ton cerveau !");
         System.out.println(
                 "Ton score te permettra d'augmenter ton savoir ou d'en perdre si tu obtiens ou non la moyenne.");
-        System.out.println(
-                "Cependant, n'oublie pas que chaque question te fera gagner ou perdre du savoir ! Le résultat du défi ne sera qu'un bonus/malus sur ton savoir !");
+                System.out.println(
+                    "Cependant, n'oublie pas que chaque question te fera gagner ou perdre du savoir ! Le résultat du défi ne sera qu'un bonus/malus sur ton savoir !");
+
+                    System.out.println(String.format(
+                "Tente de répondre à un maximum de questions justes pour battre %s.", atq_avatar.getName()));
         System.out.println(
                 "-----------------------------------------------------------------------------------------------------------------------------------------------------------");
 
@@ -170,10 +161,9 @@ public class Interface_Defis {
             int currentPV = user.getPV();
             int pt_gagne = 0;
             int pt_perdu = 0;
+            
 
-            List<Question> questions = dbProcess.generate_question(nb_questions, theme);
-
-            System.out.println("Défi solo");
+            System.out.println(String.format("Défi vs %s", atq_avatar.getName()));
 
             for (int i = 0; i < nb_questions; i++) {
                 Question question = questions.get(i);
@@ -226,152 +216,42 @@ public class Interface_Defis {
             }
             System.out.println(
                     "-----------------------------------------------------------------------------------------------------------------------------------------------------------");
+                    
+                    int pts = pt_gagne - pt_perdu;
+                    if (pts < 0)
+                        pts = 0;
 
-            System.out.println("Taper n'importe quoi pour quitter");
-            scanner.nextLine();
+                    int pts_ennemi = (int) defi.get("score_atq");
+                    System.out.println(String.format(
+                        "%s a marqué %s...", (String) atq_avatar.getName(), pts_ennemi > 1 ? String.format("%s points", pts_ennemi) : String.format("%s point", pts_ennemi))
+                    );
+                    gestion.wait(3000);
+                    System.out.println(String.format(
+                            "Et tu as marqué %s...", pts  > 1 ? String.format("%s points", pts) : String.format("%s point", pts))
+                    );
 
-        }
-    }
-
-    private void defi(Avatar user) {
-
-        String theme = "";
-        System.out.println("Défi");
-        System.out.println(
-                "-----------------------------------------------------------------------------------------------------------------------------------------------------------");
-
-        String cible;
-        int nb_jours = 0;
-        while (true) {
-            System.out.println("Qui veux-tu défier ???");
-            cible = scanner.nextLine();
-            if (!dbProcess.isUser(cible))
-                System.out.println("ERREUR: Cet utilisateur n'existe pas.");
-            else {
-                System.out.println("Confirmer: o/n");
-
-                if (scanner.nextLine().toLowerCase().equals("o")) {
-                    break;
-                }
-            }
-        }
-
-        while (true) {
-            System.out.println(String.format("Combien de jours laisses-tu %s pour répondre aux questions ???", cible));
-            try {
-                nb_jours = Integer.parseInt(scanner.nextLine());
-
-                if (nb_jours <= 0)
-                    System.out.println("ERREUR: Temps invalide.");
-                else {
-                    break;
-                }
-            } catch (Exception e) {
-                System.out.println("ERREUR: Nombre invalide.");
-            }
-        }
-
-        while (true) {
-            System.out.println(String.format("Choisissez le thème:\nThèmes:\n- Tout\n%s", dbProcess.getThemes()));
-            theme = scanner.nextLine().toLowerCase();
-            if (dbProcess.isTheme(theme) || theme.equals("tout")) {
-                if (theme.equals("tout"))
-                    theme = "";
-                break;
-            }
-
-            System.out.println(String.format("Le thème %s n'esiste pas", theme));
-            gestion.wait(1000);
-
-        }
-
-        int nb_questions = Math.min(20, dbProcess.get_nb_questions(theme));
-
-        System.out.println(
-                "-----------------------------------------------------------------------------------------------------------------------------------------------------------");
-        System.out.println(String.format("Tu devras répondre à une série de %s questions.", nb_questions));
-        System.out.println("Les questions auquelles tu répondras correctement seront ajoutées dans ton cerveau !");
-        System.out.println(
-                "Ton score te permettra d'augmenter ton savoir ou d'en perdre si tu obtiens ou non la moyenne.");
-        System.out.println(
-                "Cependant, n'oublie pas que chaque question te fera gagner ou perdre du savoir ! Le résultat du défi ne sera qu'un bonus/malus sur ton savoir !");
-        System.out.println(
-                "-----------------------------------------------------------------------------------------------------------------------------------------------------------");
-
-        System.out.println("Le jeu va commencer. Taper n'importe quoi pour débuter\nR - Annuler");
-
-        if (scanner.nextLine().toUpperCase().equals("R")) {
-            return;
-        } else { // Le défi commence
-            int score = 0;
-            int currentPV = user.getPV();
-            int pt_gagne = 0;
-            int pt_perdu = 0;
-
-            List<Question> questions = dbProcess.generate_question(nb_questions, theme);
-
-            System.out.println("Défi solo");
-
-            for (int i = 0; i < nb_questions; i++) {
-                Question question = questions.get(i);
-
-                System.out.println(
-                        "-----------------------------------------------------------------------------------------------------------------------------------------------------------");
-                System.out.println(String.format("Question n°%d - %s", i + 1, question.getQuestion()));
-
-                for (int num_choix = 0; num_choix < question.getChoices().size(); num_choix++) {
-                    System.out.println((num_choix + 1) + " - " + question.getChoices().get(num_choix));
-                }
-                System.out.print("Réponse -> ");
-                String resp = scanner.nextLine();
-
-                if (resp.equals(question.getResponse())) {
-                    System.out.println("Bonne réponse !");
-                    score++;
-                    pt_gagne += question.getPoints();
-                    currentPV += question.getPoints();
-                } else {
-                    System.out.println("Faux ! Réponse correcte: " + question.getResponse());
-                    if (currentPV - question.getPoints() < 0) {
-                        currentPV = 0;
+                    if (pts_ennemi < pts) {
+                        System.out.println(String.format(
+                            "Et le vainqueur est %s !!! Félicitations...", user.getName())
+                        );
+                        dbProcess.updateStatsVictoire(user.getId(), (String) defi.get("duel_id"), false);
+                        dbProcess.updateDuelVainqueur((String) defi.get("duel_id"), user.getId());
+                    } else if (pts_ennemi > pts) {
+                        System.out.println(String.format(
+                            "Et le vainqueur est %s !!! Dommage...", user.getName())
+                        );
+                        dbProcess.updateStatsDefaite(user.getId(), (String) defi.get("duel_id"), false);
+                        dbProcess.updateDuelVainqueur((String) defi.get("duel_id"), atq_avatar.getId());
                     } else {
-                        currentPV -= question.getPoints();
+                        System.out.println("Match nul..."
+                        );
+                        dbProcess.updateDuelVainqueur((String) defi.get("duel_id"), "Aucune");
                     }
-                    pt_perdu += question.getPoints();
 
-                    gestion.wait(2000);
-                }
-            }
 
-            System.out.println(
+            System.err.println();            
+                    System.out.println(
                     "-----------------------------------------------------------------------------------------------------------------------------------------------------------");
-            int changement_val_savoir = score - (nb_questions / 2);
-            dbProcess.updatePV(user.getId(), currentPV + changement_val_savoir);
-            dbProcess.updateStats(user.getId(), nb_questions, score, "vs", pt_gagne, pt_perdu);
-
-            Avatar cible_avatar = dbProcess.getUserByName(cible);
-            int pts = pt_gagne - pt_perdu;
-            if (pts < 0)
-                pts = 0;
-
-            dbProcess.addQuestionDuel(questions, user.getId(), cible_avatar.getId(), pts, nb_jours);
-
-            System.out.println("Résultat du défi: " + score + "/" + nb_questions);
-            if (score > (nb_questions / 2)) {
-                System.out.println("Tu as obtenu un score supérieur à la moyenne ! Voici un bonus de savoir: +"
-                        + changement_val_savoir);
-            } else if (score < (nb_questions / 2)) {
-                System.out
-                        .println(
-                                "Tu as obtenu un score inférieur à la moyenne ! Tu écopes donc d'un malus de savoir: "
-                                        + changement_val_savoir);
-            } else {
-                System.out.println("Tu as obtenu la moyenne ! Tu n'obtiens ni de bonus ni de malus de savoir...");
-            }
-            System.out.println(
-                    "-----------------------------------------------------------------------------------------------------------------------------------------------------------");
-
-            System.out.println(String.format("%s va recevoir une notification du combat.", cible));
 
             System.out.println("Taper n'importe quoi pour quitter");
             scanner.nextLine();

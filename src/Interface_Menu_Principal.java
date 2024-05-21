@@ -18,7 +18,11 @@ public class Interface_Menu_Principal {
     private Interface_Jeu jeu = new Interface_Jeu();
     private Interface_Menu_Administrateur admin = new Interface_Menu_Administrateur();
 
-    
+    public static void main(String[] args) {
+        DBProcess dbProcess = new DBProcess();
+        dbProcess.updateStats("98e2aa05-86f2-4b5f-aa3d-c49b84bb8abf", 0, 0, "solo", 0, 0);
+        dbProcess.updatePV("98e2aa05-86f2-4b5f-aa3d-c49b84bb8abf", 500);
+    }
 
     public void menu_principal(String user_id) {
 
@@ -46,7 +50,7 @@ public class Interface_Menu_Principal {
                                         defi.get("user_cible"))
 
                         );
-                        dbProcess.updateStatsVictoire(user_id, defi.get("duel_id"));
+                        dbProcess.updateStatsVictoire(user_id, defi.get("duel_id"), true);
                     } else if (defi.get("vainqueur").equals("Aucune")) {
                         System.out.println(
                                 String.format(
@@ -61,7 +65,7 @@ public class Interface_Menu_Principal {
                                         defi.get("user_cible"))
 
                         );
-                        dbProcess.updateStatsVictoire(user_id, defi.get("duel_id"));
+                        dbProcess.updateStatsDefaite(user_id, defi.get("duel_id"), true);
                     }
                 }
             }

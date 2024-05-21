@@ -152,7 +152,7 @@ public class DBProcess {
             Connection maj_pv_conn = DriverManager.getConnection(db_url);
             Statement maj_pv_stmt = maj_pv_conn.createStatement();
 
-            maj_pv_stmt.execute(String.format("UPDATE Joueurs SET pv = %s WHERE user_id='%s'", value, user_id));
+            maj_pv_stmt.execute(String.format("UPDATE Joueurs SET pv = %d WHERE user_id='%s'", value, user_id));
 
             maj_pv_conn.close();
 
@@ -200,22 +200,20 @@ public class DBProcess {
         return questions;
     }
 
-    public List<Question> get_question_duel(String duel_id, String atq) {
+    public List<Question> get_question_duel(String duel_id) {
         List<Question> questions = new ArrayList<Question>();
-
-        atq = getUserByName(atq).getId();
 
         try {
             Connection get_question_duel_conn = DriverManager.getConnection(db_url);
             Statement get_question_duel_stmt = get_question_duel_conn.createStatement();
 
             ResultSet resultat = get_question_duel_stmt.executeQuery(String
-                    .format("SELECT * FROM duel d JOIN Questions_duel qd ON d.duel_id = qd.duel_id JOIN Questions q ON q.question_id = qd.question_id WHERE user_atq = '%s' ORDER BY RANDOM()",
-                            atq));
+                    .format("SELECT * FROM duel d JOIN Questions_duel qd ON d.duel_id = qd.duel_id JOIN Questions q ON q.question_id = qd.question_id WHERE d.duel_id = '%s' ORDER BY RANDOM()",
+                            duel_id));
 
             while (resultat.next()) {
 
-                int id = resultat.getInt("q.question_id");
+                int id = resultat.getInt("question_id");
                 String texte = resultat.getString("question");
                 int val = resultat.getInt("point");
                 List<String> choix = new ArrayList<String>();
@@ -470,8 +468,10 @@ public class DBProcess {
             Statement removeQuestionDuel_stmt = removeQuestionDuel_conn.createStatement();
 
             removeQuestionDuel_stmt.executeUpdate(String
-                    .format("DELETE FROM duel WHERE duel_id = '%s'; DELETE FROM Questions_duel WHERE duel_id = '%s';",
-                            duel_id, duel_id));
+                    .format("DELETE FROM duel WHERE duel_id = '%s'",
+                            duel_id));
+
+            removeQuestionDuel_stmt.executeUpdate(String.format("DELETE FROM Questions_duel WHERE duel_id = '%s'", duel_id));
 
             removeQuestionDuel_conn.close();
 
@@ -600,11 +600,14 @@ public class DBProcess {
 
     public void updateStats(String user_id, int questions, int question_juste, String type_defi, int pt_gagne,
             int pt_perdu) {
-        if (getStat(user_id) != null) {
+        
+                
             try {
                 Connection updateStats_conn = DriverManager.getConnection(db_url);
                 Statement updateStats_stmt = updateStats_conn.createStatement();
-
+                if (getStat(user_id) == null) {
+                    updateStats_stmt.executeUpdate(String.format("INSERT INTO Stats (user_id) VALUES ('%S')", user_id));
+                }
                 String stats = "";
 
                 switch (type_defi) {
@@ -624,7 +627,8 @@ public class DBProcess {
                         break;
                 }
 
-                updateStats_stmt.execute(String.format("UPDATE Stats SET %s WHERE user_id = '%s'", stats, user_id));
+
+                updateStats_stmt.executeUpdate(String.format("UPDATE Stats SET tot_question_defi_vs = 1 WHERE user_id = '%s'", 2, user_id));
 
                 updateStats_conn.close();
 
@@ -632,7 +636,7 @@ public class DBProcess {
                 e.printStackTrace();
             }
 
-        }
+        
     }
 
     public void updateStatsOubli(String user_atq, String user_cible, String duel_id) {
@@ -641,12 +645,12 @@ public class DBProcess {
             Connection updateStatsOubli_conn = DriverManager.getConnection(db_url);
             Statement updateStatsOubli_stmt = updateStatsOubli_conn.createStatement();
 
-            updateStatsOubli_stmt.execute(
+            updateStatsOubli_stmt.executeUpdate(
                     String.format("UPDATE Stats SET oubli_vs = oubli_vs + 1 WHERE user_id = '%s'", user_cible));
 
             updateStatsOubli_conn.close();
 
-            updateStatsVictoire(user_atq, duel_id);
+            updateStatsVictoire(user_atq, duel_id, true);
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -654,18 +658,21 @@ public class DBProcess {
 
     }
 
-    public void updateStatsVictoire(String user_atq, String duel_id) {
+    public void updateStatsVictoire(String user_atq, String duel_id, boolean delete) {
 
         try {
             Connection updateStatsVictoire_conn = DriverManager.getConnection(db_url);
             Statement updateStatsVictoire_stmt = updateStatsVictoire_conn.createStatement();
 
-            updateStatsVictoire_stmt.execute(
-                    String.format("UPDATE Stats SET victoire_vs = victoire_vs + 1, match_vs = match_vs + 1 WHERE user_id = '%s'", user_atq));
+            updateStatsVictoire_stmt.executeUpdate(
+                    String.format(
+                            "UPDATE Stats SET victoire_vs = victoire_vs + 1, match_vs = match_vs + 1 WHERE user_id = '%s'",
+                            user_atq));
 
             updateStatsVictoire_conn.close();
 
-            removeQuestionDuel(duel_id);
+            if (delete)
+                removeQuestionDuel(duel_id);
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -673,18 +680,40 @@ public class DBProcess {
 
     }
 
-    public void updateStatsDefaite(String user_atq, String duel_id) {
+    public void updateStatsDefaite(String user_atq, String duel_id, boolean delete) {
 
         try {
             Connection updateStatsDefaite_conn = DriverManager.getConnection(db_url);
             Statement updateStatsDefaite_stmt = updateStatsDefaite_conn.createStatement();
 
-            updateStatsDefaite_stmt.execute(
-                    String.format("UPDATE Stats SET defaite_vs = defaite_vs + 1, match_vs = match_vs + 1 WHERE user_id = '%s'", user_atq));
+            updateStatsDefaite_stmt.executeUpdate(
+                    String.format(
+                            "UPDATE Stats SET defaite_vs = defaite_vs + 1, match_vs = match_vs + 1 WHERE user_id = '%s'",
+                            user_atq));
 
             updateStatsDefaite_conn.close();
 
-            removeQuestionDuel(duel_id);
+            if (delete)
+                removeQuestionDuel(duel_id);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void updateDuelVainqueur(String duel_id, String vainqueur) {
+
+        try {
+            Connection updateDuelVainqueur_conn = DriverManager.getConnection(db_url);
+            Statement updateDuelVainqueur_stmt = updateDuelVainqueur_conn.createStatement();
+
+            updateDuelVainqueur_stmt.executeUpdate(
+                    String.format(
+                            "UPDATE duel SET vainqueur = '%s' WHERE duel_id = '%s'",
+                            vainqueur, duel_id));
+
+            updateDuelVainqueur_conn.close();
 
         } catch (SQLException e) {
             e.printStackTrace();
