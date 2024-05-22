@@ -9,6 +9,8 @@ public class Interface_Menu_Parametres {
     SysGestion gestion = new SysGestion();
     DBProcess dbProcess = new DBProcess();
 
+    Interface_Menu_Classements classements = new Interface_Menu_Classements();
+
     Scanner scanner = new Scanner(System.in);
 
     public void menu_parametres(String user_id) {
@@ -29,9 +31,13 @@ public class Interface_Menu_Parametres {
                 System.out.println("O - Proposer une question");
             }
 
-            System.out.println("I - Statut des questions...");
+            System.out.println("U - Statut des questions...");
 
-            System.out.println("N - Retour");
+            System.out.println("C - Classements...");
+
+            System.out.println("N - Changer le nom de l'utilisateur...");
+
+            System.out.println("T - Retour");
             switch (scanner.nextLine().toUpperCase()) {
                 case "P":
                     afficher_statistiques(user);
@@ -45,13 +51,22 @@ public class Interface_Menu_Parametres {
                     ajouter_question(user);
                     break;
 
-                case "I":
+                case "U":
                     afficher_questions_attente(user);
                     break;
-                case "N":
+
+                case "C":
+                    classements.menu_classements(user_id);
+                    break;
+
+                case "T":
                     System.out.println(String.format("Au revoir %s !!!", user.getName()));
                     gestion.wait(2000);
                     return;
+
+                case "N":
+                    changer_utilisateur(user);
+                    break;
 
                 default:
                     System.out.println("Commande saisie invalide...");
@@ -274,6 +289,27 @@ public class Interface_Menu_Parametres {
         }
         System.out.println("Cliquez sur Entrée pour revenir dans les paramètres...");
         scanner.nextLine();
+
+    }
+
+    private void changer_utilisateur(Avatar user) {
+        System.out.println(
+                "----------------------------------------------------------------------------------------------------------------------");
+
+        System.out.println("Nouveau nom: ");
+        while (true) {
+            String nouveau_nom = scanner.nextLine();
+            if (nouveau_nom.equals("")) System.out.println("Erreur: Le nom n'est pas autorisé.");
+            else if (dbProcess.getUserByName(nouveau_nom) != null) System.out.println("Erreur: " + nouveau_nom + " existe déja...");
+            else {
+                System.out.println(
+                    "SUCCESS: Nouveau nom: " + nouveau_nom
+                );
+                dbProcess.updateUsername(user.getName(), nouveau_nom);
+                gestion.wait(3000);
+                break;
+            }
+        }
 
     }
 }

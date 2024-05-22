@@ -125,6 +125,67 @@ public class DBProcess {
         return null;
     }
 
+    public void updateUsername(String user_id, String new_username) {
+
+        try {
+            Connection updateUsername_conn = DriverManager.getConnection(db_url);
+            Statement updateUsername_stmt = updateUsername_conn.createStatement();
+
+            updateUsername_stmt.executeUpdate(
+                    String.format("UPDATE Joueurs SET name = '%s' WHERE user_id = '%s'", new_username, user_id));
+
+                    updateUsername_conn.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public List<String> get_classement_points() {
+        List<String> classement = new ArrayList<>();
+
+        try {
+            Connection get_duel_conn = DriverManager.getConnection(db_url);
+            Statement get_duel_stmt = get_duel_conn.createStatement();
+
+            ResultSet resultat = get_duel_stmt.executeQuery("SELECT user_id FROM Joueurs ORDER BY pv DESC");
+
+            while (resultat.next()) {
+
+                classement.add(resultat.getString("user_id"));
+
+            }
+            get_duel_conn.close();
+            return classement;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return classement;
+    }
+
+    public List<String> get_classement_victoire() {
+        List<String> classement = new ArrayList<>();
+
+        try {
+            Connection get_duel_conn = DriverManager.getConnection(db_url);
+            Statement get_duel_stmt = get_duel_conn.createStatement();
+
+            ResultSet resultat = get_duel_stmt.executeQuery("SELECT user_id FROM Stats ORDER BY victoire_vs DESC");
+
+            while (resultat.next()) {
+
+                classement.add(resultat.getString("user_id"));
+
+            }
+            get_duel_conn.close();
+            return classement;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return classement;
+    }
+
     public int get_nb_questions(String theme) {
         int nb_questions = 0;
         try {
@@ -312,21 +373,44 @@ public class DBProcess {
         return questions;
     }
 
-    public ResultSet get_question_response() {
+    public List<Question> get_question_response(String user_id) {
+        List<Question> questions = new ArrayList<>();
         try {
-            Connection getStat_conn = DriverManager.getConnection(db_url);
-            Statement getStat_stmt = getStat_conn.createStatement();
+            Connection get_question_attente_conn = DriverManager.getConnection(db_url);
+            Statement get_question_attente_stmt = get_question_attente_conn.createStatement();
 
-            ResultSet resp = getStat_stmt
-                    .executeQuery("SELECT * FROM Questions_request WHERE status IS NOT NULL");
+            ResultSet resultat = get_question_attente_stmt
+                    .executeQuery(
+                        String.format(
+                            "SELECT * FROM Questions_request WHERE status IS NOT NULL AND user_id = '%s'",
+                            user_id));
 
-            return resp;// Return true if the user was found
+            while (resultat.next()) {
+                int id = resultat.getInt("question_id");
+                String texte = resultat.getString("question");
+                int val = resultat.getInt("point");
+                List<String> choix = new ArrayList<String>();
+                choix.add(resultat.getString("choix1"));
+                choix.add(resultat.getString("choix2"));
+                if (resultat.getString("choix3") != null)
+                    choix.add(resultat.getString("choix3"));
+                if (resultat.getString("choix4") != null)
+                    choix.add(resultat.getString("choix4"));
+                String reponse = resultat.getString("response");
+                String theme = resultat.getString("theme");
+
+                String status = resultat.getString("status");
+
+                questions.add(new Question(id, texte, choix, reponse, val, theme, status));
+
+            }
+            get_question_attente_conn.close();
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        return null;
+        return questions;
     }
 
     public void removeQuestionRequest(int question_id) {
@@ -335,7 +419,7 @@ public class DBProcess {
             Statement removeQuestionRequest_stmt = removeQuestionRequest_conn.createStatement();
 
             removeQuestionRequest_stmt.executeUpdate(String
-                    .format("DELETE FROM Question_Request WHERE question_id = %d",
+                    .format("DELETE FROM Questions_Request WHERE question_id = %d",
                             question_id));
 
             removeQuestionRequest_conn.close();
