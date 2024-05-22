@@ -16,14 +16,18 @@ public class DBProcess {
                 Connection inscription_conn = DriverManager.getConnection(db_url);
                 Statement inscription_stmt = inscription_conn.createStatement();
 
-                String requete_sql = String.format(
-                        "INSERT INTO Joueurs (user_id, name, mdp, pv) VALUES ('%s','%s', '%s', 0); INSERT INTO Stats (user_id) VALUES (%s);",
-                        avatar.getId(),
-                        avatar.getName(),
-                        avatar.getMdp(),
-                        avatar.getPV(),
-                        avatar.getId());
-                inscription_stmt.executeUpdate(requete_sql);
+         
+                inscription_stmt.executeUpdate(String.format(
+                    "INSERT INTO Joueurs (user_id, name, mdp, pv) VALUES ('%s','%s', '%s', 0)",
+                    avatar.getId(),
+                    avatar.getName(),
+                    avatar.getMdp(),
+                    avatar.getPV()));
+
+                inscription_stmt.executeUpdate(String.format(
+                    "INSERT INTO Stats (user_id) VALUES ('%s')",
+                    avatar.getId()));
+
                 inscription_conn.close();
 
             } catch (SQLException e) {
