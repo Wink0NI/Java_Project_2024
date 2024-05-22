@@ -31,6 +31,7 @@ public class Interface_Menu_Administrateur {
             System.out.println("S - Retirer une questions.");
             System.out.println("M - Ajouter un nouvel administrateur.");
             System.out.println("R - Retirer un administrateur.");
+            System.out.println("U - Liste des questions proposés.");
 
             System.out.println("B - Retour au menu principal");
 
@@ -41,12 +42,17 @@ public class Interface_Menu_Administrateur {
                 case "S":
                     retirer_question();
                     break;
+
                 case "M":
                     ajouter_Administrateur(user);
                     break;
 
                 case "R":
                     retirer_Administrateur(user);
+                    break;
+
+                case "U":
+                    voir_question_proposer(user);
                     break;
 
                 case "B":
@@ -88,7 +94,7 @@ public class Interface_Menu_Administrateur {
                         } else {
                             break;
                         }
-                    } catch (InputMismatchException e) {
+                    } catch (Exception e) {
                         System.out.println("ERREUR: Le nombre entré n'est pas un nombre.");
                         nb = 0;
                     }
@@ -125,7 +131,7 @@ public class Interface_Menu_Administrateur {
                         } else {
                             break;
                         }
-                    } catch (InputMismatchException e) {
+                    } catch (Exception e) {
                         System.out.println("ERREUR: Le nombre entré n'est pas un nombre.");
                         nb = 0;
                     }
@@ -266,6 +272,87 @@ public class Interface_Menu_Administrateur {
             System.out.println(String.format("SUCCES: %s retiré de la liste des administrateurs.", admin));
         }
         gestion.wait(2000);
+    }
+
+    private void voir_question_proposer(Avatar user) {
+        System.out.println(
+                "----------------------------------------------------------------------------------------------------------------------");
+        System.out.println("Liste des questions proposés...");
+        System.out.println(
+                "----------------------------------------------------------------------------------------------------------------------");
+        List<Question> questions = dbProcess.get_question_attente();
+
+        if (questions.size() == 0) {
+            System.out.println("Aucune question en attente...");
+        } else {
+            for (int i = 0; i < questions.size(); i++) {
+                Avatar userDemande = dbProcess.getUserById(questions.get(i).getUserId());
+
+                System.out.println(
+                        String.format(
+                                "%d - %s (Score: %d) par %s",
+                                i + 1, questions.get(i).getQuestion(), questions.get(i).getPoints(),
+                                userDemande.getName()));
+                System.out.println(
+                        String.format(
+                                "Theme: %s",
+                                questions.get(i).getTheme()));
+                System.out.println(
+                        String.format(
+                                "Nombre de choix: %d",
+                                questions.get(i).getChoices().size()));
+                for (int choix = 0; choix < questions.get(i).getChoices().size(); choix++) {
+                    System.out.println(
+                            String.format(
+                                    "Choix %d: %s",
+                                    choix + 1, questions.get(i).getChoices().get(choix)));
+
+                    
+
+                }
+                System.out.println(
+                            String.format(
+                                    "Réponse: %s",
+                                    questions.get(i).getResponse()));
+
+                System.out.println(
+                "----------------------------------------------------------------------------------------------------------------------");
+                System.out.println("Accepter la question ?? o/n/q (quitter)");
+                boolean answer = false;
+
+                while (!answer) {
+                    String input = scanner.nextLine().toLowerCase();
+                    
+                    
+                    switch (input) {
+                        case "o":
+                            // Proceed with accepting the question
+                            System.out.println("Question accepté.");
+                            dbProcess.addQuestion(questions.get(i));
+                            dbProcess.updateQuestionRequestStatus(questions.get(i).getId(), "ACCEPTED");
+                            answer = true;
+                            break; // Exit the loop
+                        case "n":
+                            // Decline the question
+                            System.out.println("Question refusé.");
+                            dbProcess.updateQuestionRequestStatus(questions.get(i).getId(), "REFUSED");
+                            answer = true;
+                            break; // Exit the loop
+                        case "q":
+                            // Quit the process
+                            System.out.println("Retour au menu administrateur...");
+                            return; // Exit the loop
+                        default:
+                            // Invalid input, ask again
+                            System.out.println("Entrée invalide o/n/q.");
+                    }
+                }
+                
+
+            }
+        }
+
+        gestion.wait(3000);
     }
 
 }

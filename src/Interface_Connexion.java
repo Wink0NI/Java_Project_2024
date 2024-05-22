@@ -20,7 +20,6 @@ public class Interface_Connexion {
         menu_Principal = new Interface_Menu_Principal();
     }
 
-    private Avatar joueur; // Avatar du joueur
     Scanner scanner = new Scanner(System.in);
 
     /**

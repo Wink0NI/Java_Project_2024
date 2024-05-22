@@ -34,11 +34,12 @@ public class Interface_Defis {
                 System.out.println(
                         "NOTIFICATIONS");
                 for (HashMap<String, String> defi : resultat_defi) {
+                    Avatar ennemi = dbProcess.getUserById(defi.get("user_cible"));
                     if (defi.get("vainqueur").equals(user_id)) {
                         System.out.println(
                                 String.format(
                                         "%s a accepté ton défi, mais il n'a pas eu suffisament de puissance pour te dominer. Bravo !!!",
-                                        defi.get("user_cible"))
+                                        ennemi.getName())
 
                         );
                         dbProcess.updateStatsVictoire(user_id, defi.get("duel_id"), true);
@@ -46,14 +47,14 @@ public class Interface_Defis {
                         System.out.println(
                                 String.format(
                                         "%s a accepté ton défi, et il a eu suffisament de point pour ne pas perdre.",
-                                        defi.get("user_cible"))
+                                        ennemi.getName())
 
                         );
                     } else {
                         System.out.println(
                                 String.format(
                                         "%s a accepté ton défi, et il a pas eu suffisament de puissance pour te dominer. Dommage !!!",
-                                        defi.get("user_cible"))
+                                        ennemi.getName())
 
                         );
                         dbProcess.updateStatsDefaite(user_id, defi.get("duel_id"), true);
@@ -121,6 +122,7 @@ public class Interface_Defis {
 
             } catch (Exception e) {
                 System.out.println("ERREUR: Nombre invalide...");
+                System.out.println(e);
                 gestion.wait(2000);
             }
 
@@ -238,7 +240,7 @@ public class Interface_Defis {
                         dbProcess.updateDuelVainqueur((String) defi.get("duel_id"), user.getId());
                     } else if (pts_ennemi > pts) {
                         System.out.println(String.format(
-                            "Et le vainqueur est %s !!! Dommage...", user.getName())
+                            "Et le vainqueur est %s !!! Dommage...", atq_avatar.getName())
                         );
                         dbProcess.updateStatsDefaite(user.getId(), (String) defi.get("duel_id"), false);
                         dbProcess.updateDuelVainqueur((String) defi.get("duel_id"), atq_avatar.getId());

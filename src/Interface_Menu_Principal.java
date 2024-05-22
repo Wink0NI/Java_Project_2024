@@ -17,12 +17,8 @@ public class Interface_Menu_Principal {
 
     private Interface_Jeu jeu = new Interface_Jeu();
     private Interface_Menu_Administrateur admin = new Interface_Menu_Administrateur();
+    private Interface_Menu_Parametres parametres = new Interface_Menu_Parametres();
 
-    public static void main(String[] args) {
-        DBProcess dbProcess = new DBProcess();
-        dbProcess.updateStats("98e2aa05-86f2-4b5f-aa3d-c49b84bb8abf", 0, 0, "solo", 0, 0);
-        dbProcess.updatePV("98e2aa05-86f2-4b5f-aa3d-c49b84bb8abf", 500);
-    }
 
     public void menu_principal(String user_id) {
 
@@ -43,11 +39,12 @@ public class Interface_Menu_Principal {
 
             if (resultat_defi.size() > 0) {
                 for (HashMap<String, String> defi : resultat_defi) {
+                        Avatar ennemi = dbProcess.getUserById(defi.get("user_cible"));
                     if (defi.get("vainqueur").equals(user_id)) {
                         System.out.println(
                                 String.format(
                                         "%s a accepté ton défi, mais il n'a pas eu suffisament de puissance pour te dominer. Bravo !!!",
-                                        defi.get("user_cible"))
+                                        ennemi.getName())
 
                         );
                         dbProcess.updateStatsVictoire(user_id, defi.get("duel_id"), true);
@@ -55,14 +52,14 @@ public class Interface_Menu_Principal {
                         System.out.println(
                                 String.format(
                                         "%s a accepté ton défi, et il a eu suffisament de point pour ne pas perdre.",
-                                        defi.get("user_cible"))
+                                        ennemi.getName())
 
                         );
                     } else {
                         System.out.println(
                                 String.format(
                                         "%s a accepté ton défi, et il a pas eu suffisament de puissance pour te dominer. Dommage !!!",
-                                        defi.get("user_cible"))
+                                        ennemi.getName())
 
                         );
                         dbProcess.updateStatsDefaite(user_id, defi.get("duel_id"), true);
@@ -97,7 +94,7 @@ public class Interface_Menu_Principal {
             System.out.println(
                     "----------------------------------------------------------------------------------------------------------------------");
             System.out.println("J - Jouer");
-            System.out.println("S - Voir les statistiques");
+            System.out.println("S - Rue sociale");
 
             if (dbProcess.isAdmin(user.getName())) {
                 System.out.println("A - Mode Administrateur");
@@ -110,7 +107,7 @@ public class Interface_Menu_Principal {
                     break;
 
                 case "S":
-                    afficher_statistiques(user);
+                parametres.menu_parametres(user_id);
                     break;
 
                 case "D":
@@ -133,94 +130,5 @@ public class Interface_Menu_Principal {
         }
     }
 
-    private void afficher_statistiques(Avatar user) {
-        try {
-            ResultSet stats = dbProcess.getStat(user.getId());
-
-            gestion.clear();
-            System.out.println(
-                    "----------------------------------------------------------------------------------------------------------------------");
-            System.out.println("Statistiques");
-            System.out.println(
-                    "----------------------------------------------------------------------------------------------------------------------");
-
-            System.out.println(String.format("id: %s", user.getId()));
-            System.out.println(String.format("Nom: %s", user.getName()));
-            System.out.println(String.format("Points: %s", user.getPV()));
-
-            System.out.println(
-                    "----------------------------------------------------------------------------------------------------------------------");
-            System.out.println("Statistiques de parties");
-            System.out.println(
-                    "----------------------------------------------------------------------------------------------------------------------");
-            System.out.println(String.format("Nombre de défi solo joué: %d", stats.getInt("defi_solo")));
-            System.out.println(
-                    String.format("Questions répondus en défi solo: %d", stats.getInt("tot_question_defi_solo")));
-            System.out.println(
-                    String.format("Questions répondus juste en défi solo: %d", stats.getInt("jus_question_defi_solo")));
-            System.out.println(String.format("Moyenne des questions répondus juste en défi solo: %.2f", stats.getInt("tot_question_defi_solo") == 0 ? 0 :
-                    (double) (stats.getInt("jus_question_defi_solo")) / (stats.getInt("tot_question_defi_solo"))
-                            * 100.0)
-                    + "%");
-            System.out.println(String.format("Points gagnés en défi solo: %d", stats.getInt("pt_gagne_defi_solo")));
-            System.out.println(String.format("Points perdus en défi solo: %d", stats.getInt("pt_perdu_defi_solo")));
-
-            System.out.println(
-                    "----------------------------------------------------------------------------------------------------------------------");
-
-            System.out.println(String.format("Nombre de défi vs joué: %d", stats.getInt("defi_vs")));
-            System.out.println(
-                    String.format("Questions répondus en défi vs: %d", stats.getInt("tot_question_defi_vs")));
-            System.out.println(
-                    String.format("Questions répondus juste en défi vs: %d", stats.getInt("jus_question_defi_vs")));
-            System.out.println(String.format("Moyenne des questions répondus juste en défi vs: %.2f", stats.getInt("tot_question_defi_vs") == 0 ? 0 :
-                    (double) (stats.getInt("jus_question_defi_vs")) / (stats.getInt("tot_question_defi_vs"))
-                            * 100.0)
-                    + "%");
-            System.out.println(String.format("Points gagnés en défi vs: %d", stats.getInt("pt_gagne_defi_vs")));
-            System.out.println(String.format("Points perdus en défi vs: %d", stats.getInt("pt_perdu_defi_vs")));
-
-            System.out.println(String.format("Matchs réalisés en défi vs: %d", stats.getInt("match_vs")));
-            System.out
-                    .println(String.format("Victoires de match réalisés en défi vs: %d", stats.getInt("victoire_vs")));
-            System.out.println(String.format("Pourcentage de victoire en match vs: %.2f", stats.getInt("match_vs") == 0 ? 0 :
-                    (double) (stats.getInt("victoire_vs")) / (stats.getInt("match_vs"))
-                            * 100.0)
-                    + "%");
-
-            System.out.println(
-                    "----------------------------------------------------------------------------------------------------------------------");
-
-            System.out.println(
-                    String.format("Nombre de défi effectués: %d", stats.getInt("defi_solo") + stats.getInt("defi_vs")));
-            System.out.println(
-                    String.format("Questions répondus: %d",
-                            stats.getInt("tot_question_defi_solo") + stats.getInt("tot_question_defi_vs")));
-            System.out.println(
-                    String.format("Questions répondus juste: %d",
-                            stats.getInt("jus_question_defi_solo") + stats.getInt("jus_question_defi_vs")));
-            System.out.println(String.format("Moyenne des questions dépondus juste: %.2f", stats.getInt("tot_question_defi_solo") + stats.getInt("tot_question_defi_vs") == 0 ? 0 :
-                    (double) (stats.getInt("jus_question_defi_solo") + stats.getInt("jus_question_defi_vs"))
-                            / (stats.getInt("tot_question_defi_solo") + stats.getInt("tot_question_defi_vs"))
-                            * 100.0)
-                    + "%");
-            System.out.println(String.format("Points gagnés: %d",
-                    stats.getInt("pt_gagne_defi_solo") + stats.getInt("pt_gagne_defi_vs")));
-            System.out.println(String.format("Points perdus: %d",
-                    stats.getInt("pt_perdu_defi_solo") + stats.getInt("pt_perdu_defi_vs")));
-
-            stats.close();
-
-            System.out.println();
-            System.out.println("Taper sur la touche entrée pour quitter la page statistique.");
-            scanner.nextLine();
-
-        } catch (Exception e) {
-            System.out.println("Erreur lors du chargement des statistiques.");
-            System.out.println(e);
-            gestion.wait(2000);
-
-        }
-
-    }
+    
 }

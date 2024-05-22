@@ -10,6 +10,7 @@ public class Question {
     private String response; // La réponse correcte à la question
     private int points; // Le nombre de points attribués pour la réponse correcte
     private String theme;
+    private String user_id;
 
     
     public Question(int question_id, String question, List<String> choix, String response, int points, String theme) {
@@ -36,6 +37,16 @@ public class Question {
         this.points = points;
         this.choix = choix;
         this.theme = theme;
+    }
+
+    public Question(int question_id, String question, List<String> choix, String response, int points, String theme, String user_id) {
+        this.question_id = question_id;
+        this.question = question;
+        this.response = response;
+        this.points = points;
+        this.choix = choix;
+        this.theme = theme;
+        this.user_id = user_id;
     }
 
     /**
@@ -85,5 +96,9 @@ public class Question {
 
     public String getTheme() {
         return theme;
+    }
+
+    public String getUserId() {
+        return user_id;
     }
 }
