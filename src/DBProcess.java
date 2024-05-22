@@ -540,135 +540,121 @@ public class DBProcess {
     }
 
     public void addQuestion(Question question) {
-
         try {
-            Connection addQuestion_conn = DriverManager.getConnection(db_url);
-            Statement addQuestion_stmt = addQuestion_conn.createStatement();
-
-            String choix3 = "";
-            String choix4 = "";
-
-            if (question.getChoices().size() < 3)
-                choix3 = "NULL";
-            else
-                choix3 = "'" + question.getChoices().get(2) + "'";
-
-            if (question.getChoices().size() < 4)
-                choix4 = "NULL";
-            else
-                choix4 = "'" + question.getChoices().get(3) + "'";
-
-            String requete_sql = String.format(
-                    "INSERT INTO Questions (question, point, choix1, choix2, choix3, choix4, response, theme) VALUES ('%s','%s', '%s','%s',%s, %s,'%s','%s')",
-                    question.getQuestion(), question.getPoints(), question.getChoices().get(0),
-                    question.getChoices().get(1), choix3, choix4, question.getResponse(), question.getTheme());
-            addQuestion_stmt.executeUpdate(requete_sql);
-            addQuestion_conn.close();
+            Connection addQuestionConn = DriverManager.getConnection(db_url);
+            
+            String requeteSql = "INSERT INTO Questions (question, point, choix1, choix2, choix3, choix4, response, theme) VALUES (?,?,?,?,?,?,?,?)";
+            
+            PreparedStatement addQuestionStmt = addQuestionConn.prepareStatement(requeteSql);
+            
+            // Définir les paramètres de la requête
+            addQuestionStmt.setString(1, question.getQuestion()); // Pour le champ question
+            addQuestionStmt.setInt(2, question.getPoints()); // Pour le champ point
+            addQuestionStmt.setString(3, question.getChoices().get(0)); // Pour le champ choix1
+            addQuestionStmt.setString(4, question.getChoices().get(1)); // Pour le champ choix2
+            if (question.getChoices().size() >= 3) 
+            addQuestionStmt.setString(5, question.getChoices().size() >= 3? question.getChoices().get(2) : null);
+            addQuestionStmt.setString(6, question.getChoices().size() >= 4? question.getChoices().get(3) : null);
+            addQuestionStmt.setString(7, question.getResponse()); // Pour le champ response
+            addQuestionStmt.setString(8, question.getTheme()); // Pour le champ theme
+            
+            // Exécuter la requête
+            addQuestionStmt.executeUpdate();
+            
+            addQuestionConn.close();
         } catch (SQLException e) {
             e.printStackTrace();
-
         }
     }
+    
 
-    public void addQuestion(List<Question> questions) {
-
-        try {
-            Connection addQuestion_conn = DriverManager.getConnection(db_url);
-            Statement addQuestion_stmt = addQuestion_conn.createStatement();
-            String valeurs = "";
-
+    public void addQuestions(List<Question> questions) {
+        String sql = "INSERT INTO Questions (question, point, choix1, choix2, choix3, choix4, response, theme) VALUES (?,?,?,?,?,?,?,?)";
+    
+        try (Connection conn = DriverManager.getConnection(db_url);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+    
             for (Question question : questions) {
-                String choix3 = "";
-                String choix4 = "";
-
-                if (question.getChoices().size() < 3)
-                    choix3 = "NULL";
-                else
-                    choix3 = "'" + question.getChoices().get(2) + "'";
-
-                if (question.getChoices().size() < 4)
-                    choix4 = "NULL";
-                else
-                    choix4 = "'" + question.getChoices().get(3) + "'";
-
-                valeurs += String.format("('%s','%s', '%s','%s',%s, %s,'%s','%s'),", question.getQuestion(),
-                        question.getPoints(), question.getChoices().get(0), question.getChoices().get(1), choix3,
-                        choix4, question.getResponse(), question.getTheme());
+                pstmt.setString(1, question.getQuestion()); // Pour le champ question
+                pstmt.setInt(2, question.getPoints()); // Pour le champ point
+                pstmt.setString(3, question.getChoices().get(0)); // Pour le champ choix1
+                pstmt.setString(4, question.getChoices().get(1)); // Pour le champ choix2
+                pstmt.setString(5, question.getChoices().size() >= 3? question.getChoices().get(2) : null);
+                pstmt.setString(6, question.getChoices().size() >= 4? question.getChoices().get(3) : null);
+                pstmt.setString(7, question.getResponse()); // Pour le champ response
+                pstmt.setString(8, question.getTheme()); // Pour le champ theme
+    
+                pstmt.addBatch(); // Ajoute la requête à la batch pour exécution ultérieure
             }
-
-            valeurs = valeurs.substring(0, valeurs.length() - 1);
-            String requete_sql = String.format(
-                    "INSERT INTO Questions (question, point, choix1, choix2, choix3, choix4, response, theme) VALUES %s",
-                    valeurs);
-            addQuestion_stmt.executeUpdate(requete_sql);
-
-            addQuestion_conn.close();
+    
+            pstmt.executeBatch(); // Exécute toutes les requêtes en batch
+    
         } catch (SQLException e) {
             e.printStackTrace();
-
         }
     }
+    
 
-    public void addQuestionDuel(List<Question> questions, String user_atq, String user_cible, int score_atq,
-            int nb_jours) {
-
-        try {
-            Connection addQuestionDuel_conn = DriverManager.getConnection(db_url);
-            Statement addQuestionDuel_stmt = addQuestionDuel_conn.createStatement();
-            String valeurs = "";
-
-            String duel_id = UUID.randomUUID().toString();
-            while (isDuel(duel_id))
-                duel_id = UUID.randomUUID().toString();
-
+    public void addQuestionDuel(List<Question> questions, String userAtq, String userCible, int scoreAtq, int nbJours) {
+        String sqlInsertions = "INSERT INTO Questions_duel (duel_id, question_id) VALUES (?,?)";
+        String sqlDuel = "INSERT INTO duel (duel_id, user_atq, user_cible, temps_limite, score_atq) VALUES (?,?,?,?,?)";
+    
+        try (Connection conn = DriverManager.getConnection(db_url);
+             PreparedStatement pstmtQuestions = conn.prepareStatement(sqlInsertions);
+             PreparedStatement pstmtDuel = conn.prepareStatement(sqlDuel)) {
+    
+            String duelId = UUID.randomUUID().toString();
+            while (isDuel(duelId)) {
+                duelId = UUID.randomUUID().toString();
+            }
+    
+            // Insérer les questions dans Questions_duel
             for (Question question : questions) {
-                valeurs += String.format("('%s','%s'),", duel_id, question.getId());
+                pstmtQuestions.setString(1, duelId);
+                pstmtQuestions.setInt(2, question.getId());
+                pstmtQuestions.addBatch();
             }
-
-            valeurs = valeurs.substring(0, valeurs.length() - 1);
-            String requete_sql = String.format(
-                    "INSERT INTO Questions_duel (duel_id, question_id) VALUES %s; INSERT INTO duel (duel_id, user_atq, user_cible, temps_limite, score_atq) VALUES ('%s','%s', '%s', '%s', %d)",
-                    valeurs, duel_id, user_atq, user_cible,
-                    new Timestamp(System.currentTimeMillis() + 24 * 60 * 60 * 1000 * nb_jours), score_atq);
-            addQuestionDuel_stmt.executeUpdate(requete_sql);
-
-            addQuestionDuel_conn.close();
+            pstmtQuestions.executeBatch();
+    
+            // Enregistrer le duel
+            pstmtDuel.setString(1, duelId);
+            pstmtDuel.setString(2, userAtq);
+            pstmtDuel.setString(3, userCible);
+            pstmtDuel.setTimestamp(4, new Timestamp(System.currentTimeMillis() + 24 * 60 * 60 * 1000 * nbJours));
+            pstmtDuel.setInt(5, scoreAtq);
+            pstmtDuel.executeUpdate();
+    
         } catch (SQLException e) {
             e.printStackTrace();
-
         }
     }
+    
 
-    public void addQuestionRequest(Question question, String user_id) {
-
-        try {
-            Connection addQuestionRequest_conn = DriverManager.getConnection(db_url);
-            Statement addQuestionRequest_stmt = addQuestionRequest_conn.createStatement();
-
-            String choix3 = "";
-            String choix4 = "";
-
-            if (question.getChoices().size() < 3)
-                choix3 = "NULL";
-            else
-                choix3 = "'" + question.getChoices().get(2) + "'";
-
-            if (question.getChoices().size() < 4)
-                choix4 = "NULL";
-            else
-                choix4 = "'" + question.getChoices().get(3) + "'";
-
-            String requete_sql = String.format(
-                    "INSERT INTO Questions_request (user_id, question, point, choix1, choix2, choix3, choix4, response, theme) VALUES ('%s', '%s','%s', '%s','%s',%s, %s,'%s','%s')",
-                    user_id, question.getQuestion(), question.getPoints(), question.getChoices().get(0),
-                    question.getChoices().get(1), choix3, choix4, question.getResponse(), question.getTheme());
-            addQuestionRequest_stmt.executeUpdate(requete_sql);
-            addQuestionRequest_conn.close();
+    public void addQuestionRequest(Question question, String userId) {
+        String sql = "INSERT INTO Questions_request (user_id, question, point, choix1, choix2, choix3, choix4, response, theme) VALUES (?,?,?,?,?,?,?,?,?)";
+    
+        try (Connection conn = DriverManager.getConnection(db_url);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+    
+            // Définir les paramètres de la requête
+            pstmt.setString(1, userId); // Pour le champ user_id
+            pstmt.setString(2, question.getQuestion()); // Pour le champ question
+            pstmt.setInt(3, question.getPoints()); // Pour le champ point
+            pstmt.setString(4, question.getChoices().get(0)); // Pour le champ choix1
+            pstmt.setString(5, question.getChoices().get(1)); // Pour le champ choix2
+            pstmt.setString(6, question.getChoices().size() >= 3? question.getChoices().get(2) : null);
+            pstmt.setString(7, question.getChoices().size() >= 4? question.getChoices().get(3) : null);
+            pstmt.setString(8, question.getResponse()); // Pour le champ response
+            pstmt.setString(9, question.getTheme()); // Pour le champ theme
+    
+            // Exécuter la requête
+            pstmt.executeUpdate();
+    
         } catch (SQLException e) {
             e.printStackTrace();
-
         }
     }
+    
 
     public boolean isQuestion(String question) {
         try {

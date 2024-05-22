@@ -184,16 +184,17 @@ public class Interface_Menu_Principal {
                         }
                         
                         try {
-                                int note_int = Integer.parseInt(note);
-                                if (note_int < 0 || note_int > 20) System.out.println("ERREUR: Note doit être entre 0 et 20.");
+                                int note_chiffre = Integer.parseInt(note);
+                                if (note_chiffre < 0 || note_chiffre > 20) System.out.println("ERREUR: Note doit être entre 0 et 20.");
                                 else {
                                         Avatar user = dbProcess.getUserById(user_id);
 
-                                        note_int = note_int <10 ?  - rand.nextInt((note_int + 1)*2) - 1 : rand.nextInt((note_int + 1)*2) + 1;
-                                        String info_score = note_int < 10 ? "perdu" : "gagné";
+                                        note_chiffre = note_chiffre <10 ?  - rand.nextInt((note_chiffre + 10 + 1)*2) - 1 : rand.nextInt((note_chiffre + 10 + 1)*2) + 1;
+                                        String info_score = note_chiffre < 10 ? "perdu" : "gagné";
 
-                                         System.out.println(String.format("Note ajouté: Vous avez %s %s %s.", info_score, note_int, note_int > 1 || note_int < 1 ? "points" : "point"));
-                                        dbProcess.updatePV(user_id, user.getPV() + note_int);
+                                         System.out.println(String.format("Note ajouté: Vous avez %s %s %s.", info_score, note_chiffre < 0 ? - note_chiffre : note_chiffre , note_chiffre > 1 || note_chiffre < 1 ? "points" : "point"));
+                                        note_chiffre = user.getPV() + note_chiffre < 0 ? 0 : note_chiffre;
+                                        dbProcess.updatePV(user_id, note_chiffre);
                                 }
                         } catch (Exception e) {
                                 System.out.println("ERREUR: Le nombre donné est invalide.");

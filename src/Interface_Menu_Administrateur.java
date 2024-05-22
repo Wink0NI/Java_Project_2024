@@ -198,7 +198,7 @@ public class Interface_Menu_Administrateur {
                         ligne_exc++;
 
                     }
-                    dbProcess.addQuestion(questions);
+                    dbProcess.addQuestions(questions);
 
                     System.out.println("SUCCES: Questions ajoutées avec succès.");
 

@@ -300,6 +300,11 @@ public class Interface_Menu_Parametres {
         while (true) {
             String nouveau_nom = scanner.nextLine();
             if (nouveau_nom.equals("")) System.out.println("Erreur: Le nom n'est pas autorisé.");
+            else if (user.getName().equals(nouveau_nom)) {
+                System.out.println("Nom non modifiée.");
+                gestion.wait(3000);
+                break;
+            }
             else if (dbProcess.getUserByName(nouveau_nom) != null) System.out.println("Erreur: " + nouveau_nom + " existe déja...");
             else {
                 System.out.println(
