@@ -4,6 +4,7 @@ import java.util.Scanner;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
 public class Interface_Menu_Principal {
         Scanner scanner = new Scanner(System.in);
@@ -18,6 +19,8 @@ public class Interface_Menu_Principal {
         private Interface_Jeu jeu = new Interface_Jeu();
         private Interface_Menu_Administrateur admin = new Interface_Menu_Administrateur();
         private Interface_Menu_Parametres parametres = new Interface_Menu_Parametres();
+
+        Random rand = new Random();
 
         public void menu_principal(String user_id) {
 
@@ -42,16 +45,17 @@ public class Interface_Menu_Principal {
                                 for (Question question : question_requete) {
                                         if (question.getUserId().equals("ACCEPTED")) {
                                                 System.out.println(
-                                                        String.format(
-                                                                "La question %s (score %d) a été accepté par un modérateur. La question a été rajouté dans le thème %s."
-                                                                , question.getQuestion(), question.getPoints(), question.getTheme())
-                                                );
+                                                                String.format(
+                                                                                "La question %s (score %d) a été accepté par un modérateur. La question a été rajouté dans le thème %s.",
+                                                                                question.getQuestion(),
+                                                                                question.getPoints(),
+                                                                                question.getTheme()));
                                         } else {
                                                 System.out.println(
-                                                        String.format(
-                                                                "La question %s (score %d) a été refusé par un modérateur."
-                                                                , question.getQuestion(), question.getPoints())
-                                                );
+                                                                String.format(
+                                                                                "La question %s (score %d) a été refusé par un modérateur.",
+                                                                                question.getQuestion(),
+                                                                                question.getPoints()));
                                         }
                                         dbProcess.removeQuestionRequest(question.getId());
                                 }
@@ -122,6 +126,7 @@ public class Interface_Menu_Principal {
                                         "----------------------------------------------------------------------------------------------------------------------");
                         System.out.println("J - Jouer");
                         System.out.println("S - Rue sociale");
+                        System.out.println("N - Ajouter des notes");
 
                         if (dbProcess.isAdmin(user.getName())) {
                                 System.out.println("A - Mode Administrateur");
@@ -149,12 +154,52 @@ public class Interface_Menu_Principal {
                                                 gestion.wait(2000);
                                         }
                                         break;
+                                case "N":
+                                        ajouter_notes(user_id);
+                                        gestion.wait(2000);
+                                        break;
                                 default:
                                         System.out.println("Commande saisie invalide...");
                                         gestion.wait(2000);
 
                         }
                 }
+        }
+
+        private void ajouter_notes(String user_id) {
+                System.out.println(
+                                "----------------------------------------------------------------------------------------------------------------------");
+                System.out.println("Ajout des notes (entre 0 et 20).");
+                System.out.println("R - Retour");
+
+                while (true) {
+                        System.out.println(
+                                "----------------------------------------------------------------------------------------------------------------------");
+                        String note = scanner.nextLine().toLowerCase();
+
+                        if (note.equals("")) System.out.println("ERREUR: Note invalide.");
+                        else if (note.equals("r")) {
+                                System.out.println("Retour au menu principal.");
+                                break;
+                        }
+                        
+                        try {
+                                int note_int = Integer.parseInt(note);
+                                if (note_int < 0 || note_int > 20) System.out.println("ERREUR: Note doit être entre 0 et 20.");
+                                else {
+                                        Avatar user = dbProcess.getUserById(user_id);
+
+                                        note_int = note_int <10 ?  - rand.nextInt((note_int + 1)*2) - 1 : rand.nextInt((note_int + 1)*2) + 1;
+                                        String info_score = note_int < 10 ? "perdu" : "gagné";
+
+                                         System.out.println(String.format("Note ajouté: Vous avez %s %s %s.", info_score, note_int, note_int > 1 || note_int < 1 ? "points" : "point"));
+                                        dbProcess.updatePV(user_id, user.getPV() + note_int);
+                                }
+                        } catch (Exception e) {
+                                System.out.println("ERREUR: Le nombre donné est invalide.");
+                        }
+                }
+
         }
 
 }

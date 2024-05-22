@@ -220,7 +220,6 @@ public class DBProcess {
             maj_pv_stmt.executeUpdate(String.format("UPDATE Joueurs SET pv = %d WHERE user_id='%s'", value, user_id));
 
             maj_pv_conn.close();
-            System.out.println("ok");
 
         } catch (SQLException e) {
             e.printStackTrace();
