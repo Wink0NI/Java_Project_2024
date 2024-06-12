@@ -10,10 +10,19 @@ public class Question {
     private List<String> choix; // Les choix possibles pour la réponse à la question
     private String response; // La réponse correcte à la question
     private int points; // Le nombre de points attribués pour la réponse correcte
-    private String theme;
-    private String user_id;
+    private String theme; // Le thème de la question
+    private String user_id; // Auteur de la question
 
-    
+    /**
+     * Constructeur pour créer une nouvelle instance de Question.
+     *
+     * @param question_id L'identifiant unique de la question
+     * @param question Le texte de la question
+     * @param choix Les choix possibles pour la réponse à la question
+     * @param response La réponse correcte à la question
+     * @param points Le nombre de points attribués pour la réponse correcte
+     * @param theme Theme de la question
+     */
     public Question(int question_id, String question, List<String> choix, String response, int points, String theme) {
         this.question_id = question_id;
         this.question = question;
@@ -23,7 +32,7 @@ public class Question {
     }
 
     /**
-     * Constructeur pour créer une nouvelle instance de Question.
+     * Constructeur pour créer une nouvelle instance de Question (pou pouvoir créer les questions).
      *
      * @param question_id L'identifiant unique de la question
      * @param question Le texte de la question
@@ -40,6 +49,17 @@ public class Question {
         this.theme = theme;
     }
 
+    /**
+     * Constructeur pour créer une nouvelle instance de Question en attente d'une vérification admin.
+     *
+     * @param question_id L'identifiant unique de la question
+     * @param question Le texte de la question
+     * @param choix Les choix possibles pour la réponse à la question
+     * @param response La réponse correcte à la question
+     * @param points Le nombre de points attribués pour la réponse correcte
+     * @param theme Theme de la question
+     * @param user_id Auteur de la question
+     */
     public Question(int question_id, String question, List<String> choix, String response, int points, String theme, String user_id) {
         this.question_id = question_id;
         this.question = question;
@@ -95,10 +115,20 @@ public class Question {
         return points;
     }
 
+    /**
+     * Obtient le nombre de points attribués pour la réponse correcte.
+     *
+     * @return Le thème de la question
+     */
     public String getTheme() {
         return theme;
     }
 
+    /**
+     * Obtient le nombre de points attribués pour la réponse correcte.
+     *
+     * @return L'auteur de la question
+     */
     public String getUserId() {
         return user_id;
     }
