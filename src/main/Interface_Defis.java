@@ -6,7 +6,9 @@ import main.process.SysGestion;
 import java.util.List;
 import java.util.HashMap;
 import java.sql.*;
-
+/**
+ * Cette classe gère l'interface de défis pour le jeu "Question pour un champion".
+ */
 public class Interface_Defis {
 
     Scanner scanner = new Scanner(System.in);
@@ -18,7 +20,11 @@ public class Interface_Defis {
         dbProcess = new DBProcess(); // Initialize dbProcess here
         gestion = new SysGestion();
     }
-
+    /**
+     * Affiche le menu des défis et gère les actions de l'utilisateur.
+     * 
+     * @param user_id l'identifiant de l'utilisateur courant
+     */
     public void menu_Defis(String user_id) {
 
         while (true) {
@@ -131,7 +137,12 @@ public class Interface_Defis {
 
         }
     }
-
+    /**
+     * Gère le processus d'un défi.
+     * 
+     * @param user l'avatar de l'utilisateur courant
+     * @param defi les informations du défi en cours
+     */
     private void defi_vs(Avatar user, HashMap<String, Object> defi) {
 
         String theme = "";

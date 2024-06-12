@@ -8,13 +8,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.sql.*;
 import java.util.InputMismatchException;
-
+/**
+ * Classe représentant l'interface de menu pour les classements.
+ *
+ */
 public class Interface_Menu_Classements {
     SysGestion gestion = new SysGestion();
     DBProcess dbProcess = new DBProcess();
 
     Scanner scanner = new Scanner(System.in);
-
+    /**
+     * Méthode qui affiche le menu des classements.
+     *
+     * @param user_id l'identifiant de l'utilisateur connecté
+     */
     public void menu_classements(String user_id) {
         while (true) {
             Avatar user = dbProcess.getUserById(user_id);
@@ -50,7 +57,9 @@ public class Interface_Menu_Classements {
         }
 
     }
-
+    /**
+     * Méthode qui affiche le classement par points.
+     */
     private void afficher_classement_par_points() {
         System.out.println(
                 "----------------------------------------------------------------------------------------------------------------------");
@@ -76,7 +85,9 @@ public class Interface_Menu_Classements {
             scanner.nextLine();
         }
     }
-
+    /**
+     * Méthode qui affiche le classement par victoire.
+     */
     private void afficher_classement_par_victoire() {
         System.out.println(
                 "----------------------------------------------------------------------------------------------------------------------");

@@ -13,12 +13,18 @@ public class Interface_Jeu {
     protected DBProcess dbProcess;
 
     protected Interface_Defis interface_Defis; // Interface du menu principal
-
+    /**
+     * Cette classe gère l'interface de jeu pour le jeu "Question pour un champion".
+     */
     public Interface_Jeu() {
         dbProcess = new DBProcess(); // Initialize dbProcess here
         interface_Defis = new Interface_Defis(); //
     }
-
+    /**
+     * Affiche le menu de jeu et gère les actions de l'utilisateur.
+     * 
+     * @param user_id l'identifiant de l'utilisateur courant
+     */
     public void menu_jouer(String user_id) {
 
         while (true) {
@@ -57,7 +63,11 @@ public class Interface_Jeu {
 
         }
     }
-
+    /**
+     * Gère le processus d'un défi solo.
+     * 
+     * @param user l'avatar de l'utilisateur courant
+     */
     private void defi_solo(Avatar user) {
 
         String theme = "";
@@ -163,7 +173,11 @@ public class Interface_Jeu {
 
         }
     }
-
+    /**
+     * Gère le processus d'un défi contre un autre joueur.
+     * 
+     * @param user l'avatar de l'utilisateur courant
+     */
     private void defi(Avatar user) {
 
         String theme = "";

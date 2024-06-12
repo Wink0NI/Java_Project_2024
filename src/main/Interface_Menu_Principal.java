@@ -8,13 +8,26 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
-
+/**
+ * Classe représentant l'interface principale du jeu.
+ * 
+ */
 public class Interface_Menu_Principal {
         Scanner scanner = new Scanner(System.in);
         private SysGestion gestion;
         private DBProcess dbProcess;
-
+        /**
+         * Constructeur de la classe Interface_Menu_Principal.
+         * 
+         * @author Votre nom et prénom
+         * @version 1.0
+         */
         public Interface_Menu_Principal() {
+                /**
+                 * Méthode pour initialiser les objets de la classe.
+                * 
+                 * @param none
+                */
                 dbProcess = new DBProcess();
                 gestion = new SysGestion();
         }
@@ -24,7 +37,11 @@ public class Interface_Menu_Principal {
         private Interface_Menu_Parametres parametres = new Interface_Menu_Parametres();
 
         Random rand = new Random();
-
+        /**
+        * Méthode pour afficher le menu principal.
+        * 
+        * @param user_id l'identifiant de l'utilisateur connecté
+        */
         public void menu_principal(String user_id) {
 
                 while (true) {
@@ -168,7 +185,11 @@ public class Interface_Menu_Principal {
                         }
                 }
         }
-
+        /**
+         * Méthode pour ajouter des notes.
+        * 
+        * @param user_id l'identifiant de l'utilisateur connecté
+         */
         private void ajouter_notes(String user_id) {
                 System.out.println(
                                 "----------------------------------------------------------------------------------------------------------------------");

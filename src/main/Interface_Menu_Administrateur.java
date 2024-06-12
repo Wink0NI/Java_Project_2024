@@ -10,16 +10,27 @@ import java.util.ArrayList;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-
+/**
+ * Classe représentant l'interface de menu pour les administrateurs.
+ *
+ */
 public class Interface_Menu_Administrateur {
     Scanner scanner = new Scanner(System.in);
     private SysGestion gestion;
     private DBProcess dbProcess;
-
+    /**
+     * Constructeur de la classe Interface_Menu_Administrateur.
+     * Initialise la variable dbProcess avec une nouvelle instance de DBProcess.
+     *
+     */
     public Interface_Menu_Administrateur() {
         dbProcess = new DBProcess();
     }
-
+    /**
+     * Méthode qui affiche le menu administrateur.
+     *
+     * @param user_id l'identifiant de l'utilisateur connecté
+     */
     public void menu_administrateur(String user_id) {
 
         while (true) {
@@ -70,7 +81,9 @@ public class Interface_Menu_Administrateur {
             }
         }
     }
-
+    /**
+     * Méthode qui permet d'ajouter une question.
+     */
     private void ajouter_question() {
         System.out.println("Comment voulez-vous rajouter les questions ?");
         System.out.println("A - A la Main\nB - Par fichier texte/csv");
@@ -223,7 +236,11 @@ public class Interface_Menu_Administrateur {
         gestion.wait(2000);
 
     }
-
+    /**
+     * Méthode qui permet de retirer une question.
+     *
+     * @param question la question à retirer
+     */
     private void retirer_question() {
 
         System.out.println("Taper la question: ");
@@ -238,7 +255,11 @@ public class Interface_Menu_Administrateur {
 
         gestion.wait(2000);
     }
-
+    /**
+     * Méthode qui permet d'ajouter un nouvel administrateur.
+     *
+     * @param user l'utilisateur à ajouter
+     */
     private void ajouter_Administrateur(Avatar user) {
         System.out.println(
                 "----------------------------------------------------------------------------------------------------------------------");
@@ -257,7 +278,11 @@ public class Interface_Menu_Administrateur {
         }
         gestion.wait(2000);
     }
-
+    /**
+     * Méthode qui permet de retirer un administrateur.
+     *
+     * @param user l'utilisateur à retirer
+     */
     private void retirer_Administrateur(Avatar user) {
         System.out.println(
                 "----------------------------------------------------------------------------------------------------------------------");
@@ -276,7 +301,11 @@ public class Interface_Menu_Administrateur {
         }
         gestion.wait(2000);
     }
-
+    /**
+     * Méthode qui permet de voir les questions proposées.
+     *
+     * @param user l'utilisateur connecté
+     */
     private void voir_question_proposer(Avatar user) {
         System.out.println(
                 "----------------------------------------------------------------------------------------------------------------------");
