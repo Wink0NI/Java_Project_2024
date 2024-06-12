@@ -7,7 +7,10 @@ import java.util.List;
 import java.util.ArrayList;
 import java.sql.*;
 import java.util.InputMismatchException;
-
+/**
+ * Classe représentant l'interface de menu pour les paramètres.
+ *
+ */
 public class Interface_Menu_Parametres {
     SysGestion gestion = new SysGestion();
     DBProcess dbProcess = new DBProcess();
@@ -15,7 +18,11 @@ public class Interface_Menu_Parametres {
     Interface_Menu_Classements classements = new Interface_Menu_Classements();
 
     Scanner scanner = new Scanner(System.in);
-
+    /**
+     * Méthode qui affiche le menu des paramètres.
+     *
+     * @param user_id l'identifiant de l'utilisateur connecté
+     */
     public void menu_parametres(String user_id) {
         while (true) {
             Avatar user = dbProcess.getUserById(user_id);
@@ -79,7 +86,11 @@ public class Interface_Menu_Parametres {
         }
 
     }
-
+    /**
+     * Méthode qui affiche les statistiques de l'utilisateur.
+     *
+     * @param user l'utilisateur dont les statistiques sont affichées
+     */
     private void afficher_statistiques(Avatar user) {
         try {
             ResultSet stats = dbProcess.getStat(user.getId());
@@ -175,7 +186,9 @@ public class Interface_Menu_Parametres {
         }
 
     }
-
+    /**
+     * Méthode qui permet de voir le profil d'un utilisateur.
+     */
     public void voir_profil() {
         System.out.println("Quel utilisateur voulez-vous voir ?");
         Avatar user = dbProcess.getUserByName(scanner.nextLine());
@@ -187,7 +200,11 @@ public class Interface_Menu_Parametres {
             gestion.wait(2000);
         }
     }
-
+    /**
+     * Méthode qui permet d'ajouter une question.
+     *
+     * @param user l'utilisateur qui ajoute la question
+     */
     private void ajouter_question(Avatar user) {
 
         System.out.println("Taper la question: ");
@@ -266,7 +283,11 @@ public class Interface_Menu_Parametres {
         gestion.wait(5000);
 
     }
-
+    /**
+     * Méthode qui affiche les questions en attente.
+     *
+     * @param user l'utilisateur dont les questions en attente sont affichées
+     */
     public void afficher_questions_attente(Avatar user) {
 
         List<Question> listeAttente = dbProcess.get_question_user(user.getId());
@@ -294,7 +315,11 @@ public class Interface_Menu_Parametres {
         scanner.nextLine();
 
     }
-
+    /**
+     * Méthode qui permet de changer le nom d'un utilisateur.
+     *
+     * @param user l'utilisateur dont le nom est changé
+     */
     private void changer_utilisateur(Avatar user) {
         System.out.println(
                 "----------------------------------------------------------------------------------------------------------------------");
