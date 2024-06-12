@@ -208,7 +208,11 @@ public class DBProcess {
 
     }
 
-    
+    /**
+    * Méthode qui renvoie le classement des utilisateurs en fonction de leurs points de vie.
+    * 
+    * @return Une liste de chaînes contenant les identifiants des utilisateurs.
+    */
     public List<String> get_classement_points() {
         List<String> classement = new ArrayList<>();
 
@@ -230,7 +234,11 @@ public class DBProcess {
         }
         return classement;
     }
-
+    /**
+     * Méthode qui renvoie le classement des utilisateurs en fonction de leurs victoires.
+     * 
+     * @return Une liste de chaînes contenant les identifiants des utilisateurs.
+     */
     public List<String> get_classement_victoire() {
         List<String> classement = new ArrayList<>();
 
@@ -253,6 +261,12 @@ public class DBProcess {
         return classement;
     }
 
+    /**
+     * Méthode qui renvoie le nombre de questions pour un thème donné.
+     * 
+     * @param theme Le thème pour lequel on souhaite obtenir le nombre de questions.
+     * @return Le nombre de questions pour le thème spécifié.
+     */
     public int get_nb_questions(String theme) {
         int nb_questions = 0;
         try {
@@ -273,7 +287,12 @@ public class DBProcess {
         }
         return nb_questions;
     }
-
+    /**
+     * Méthode qui met à jour les points de vie d'un utilisateur.
+     * 
+     * @param user_id L'identifiant de l'utilisateur dont les points de vie doivent être mis à jour.
+     * @param value La nouvelle valeur des points de vie.
+     */
     public void updatePV(String user_id, int value) {
 
         try {
@@ -288,7 +307,13 @@ public class DBProcess {
             e.printStackTrace();
         }
     }
-
+    /**
+     * Méthode qui génère une liste de questions pour un thème donné.
+     * 
+     * @param nb_questions_totales Le nombre total de questions à générer.
+     * @param th Le thème pour lequel on souhaite générer les questions.
+     * @return Une liste de questions.
+     */
     public List<Question> generate_question(int nb_questions_totales, String th) {
         List<Question> questions = new ArrayList<Question>();
 
@@ -327,7 +352,12 @@ public class DBProcess {
         }
         return questions;
     }
-
+    /**
+     * Méthode qui renvoie la liste des questions d'un duel donné.
+     * 
+     * @param duel_id L'identifiant du duel pour lequel on souhaite obtenir les questions.
+     * @return Une liste de questions.
+     */
     public List<Question> get_question_duel(String duel_id) {
         List<Question> questions = new ArrayList<Question>();
 
@@ -364,7 +394,11 @@ public class DBProcess {
         }
         return questions;
     }
-
+    /**
+     * Méthode qui renvoie la liste des questions en attente de réponse.
+     * 
+     * @return Une liste de questions.
+     */
     public List<Question> get_question_attente() {
         List<Question> questions = new ArrayList<>();
         try {
@@ -401,7 +435,12 @@ public class DBProcess {
 
         return questions;
     }
-
+    /**
+     * Méthode qui renvoie la liste des questions d'un utilisateur donné.
+     * 
+     * @param user_id L'identifiant de l'utilisateur pour lequel on souhaite obtenir les questions.
+     * @return Une liste de questions.
+     */
     public List<Question> get_question_user(String user_id) {
         List<Question> questions = new ArrayList<Question>();
 
@@ -437,7 +476,12 @@ public class DBProcess {
         }
         return questions;
     }
-
+    /**
+     * Méthode qui renvoie la liste des questions répondues par un utilisateur.
+     * 
+     * @param user_id L'identifiant de l'utilisateur pour lequel on souhaite obtenir les questions.
+     * @return Une liste de questions.
+     */
     public List<Question> get_question_response(String user_id) {
         List<Question> questions = new ArrayList<>();
         try {
@@ -477,7 +521,11 @@ public class DBProcess {
 
         return questions;
     }
-
+    /**
+     * Méthode qui supprime une demande de question.
+     * 
+     * @param question_id L'identifiant de la question à supprimer.
+     */
     public void removeQuestionRequest(int question_id) {
         try {
             Connection removeQuestionRequest_conn = DriverManager.getConnection(db_url);
@@ -493,7 +541,12 @@ public class DBProcess {
             e.printStackTrace();
         }
     }
-
+    /**
+     * Méthode qui met à jour le statut d'une demande de question.
+     * 
+     * @param question_id L'identifiant de la question dont le statut doit être mis à jour.
+     * @param status Le nouveau statut de la question.
+     */
     public void updateQuestionRequestStatus(int question_id, String status) {
 
         try {
@@ -511,7 +564,12 @@ public class DBProcess {
         }
 
     }
-
+    /**
+     * Méthode qui renvoie les informations d'un duel donné.
+     * 
+     * @param duel_id L'identifiant du duel pour lequel on souhaite obtenir les informations.
+     * @return Un objet HashMap contenant les informations du duel.
+     */
     public HashMap<String, Object> get_duel(String duel_id) {
 
         try {
@@ -540,7 +598,12 @@ public class DBProcess {
         }
         return null;
     }
-
+    /**
+     * Méthode qui renvoie la liste des duels où l'attaquant est le joueur spécifié.
+     * 
+     * @param attaquant L'identifiant du joueur attaquant.
+     * @return Une liste d'objets HashMap contenant les informations des duels.
+     */
     public List<HashMap<String, String>> get_duels_resultat(String attaquant) {
         List<HashMap<String, String>> duels = new ArrayList<>();
 
@@ -572,7 +635,12 @@ public class DBProcess {
         }
         return duels;
     }
-
+    /**
+     * Méthode qui renvoie la liste des duels où le joueur cible est le joueur spécifié.
+     * 
+     * @param cible L'identifiant du joueur cible.
+     * @return Une liste d'objets HashMap contenant les informations des duels.
+     */
     public List<HashMap<String, Object>> get_duels(String cible) {
         List<HashMap<String, Object>> duels = new ArrayList<>();
 
@@ -601,7 +669,11 @@ public class DBProcess {
         }
         return duels;
     }
-
+    /**
+     * Méthode qui ajoute une question à la base de données.
+     * 
+     * @param question La question à ajouter.
+     */
     public void addQuestion(Question question) {
         try {
             Connection addQuestionConn = DriverManager.getConnection(db_url);
@@ -629,7 +701,11 @@ public class DBProcess {
             e.printStackTrace();
         }
     }
-
+    /**
+     * Méthode qui ajoute plusieurs questions à la base de données.
+     * 
+     * @param questions La liste des questions à ajouter.
+     */
     public void addQuestions(List<Question> questions) {
         String sql = "INSERT INTO Questions (question, point, choix1, choix2, choix3, choix4, response, theme) VALUES (?,?,?,?,?,?,?,?)";
 
@@ -655,7 +731,15 @@ public class DBProcess {
             e.printStackTrace();
         }
     }
-
+    /**
+     * Méthode qui ajoute un duel à la base de données.
+     * 
+     * @param questions La liste des questions du duel.
+     * @param userAtq L'identifiant du joueur attaquant.
+     * @param userCible L'identifiant du joueur cible.
+     * @param scoreAtq Le score de l'attaquant.
+     * @param nbJours Le nombre de jours pour le duel.
+     */
     public void addQuestionDuel(List<Question> questions, String userAtq, String userCible, int scoreAtq, int nbJours) {
         String sqlInsertions = "INSERT INTO Questions_duel (duel_id, question_id) VALUES (?,?)";
         String sqlDuel = "INSERT INTO duel (duel_id, user_atq, user_cible, temps_limite, score_atq) VALUES (?,?,?,?,?)";
@@ -689,7 +773,12 @@ public class DBProcess {
             e.printStackTrace();
         }
     }
-
+    /**
+     * Méthode qui ajoute une demande de question à la base de données.
+     * 
+     * @param question La question à ajouter.
+     * @param userId L'identifiant de l'utilisateur.
+     */
     public void addQuestionRequest(Question question, String userId) {
         String sql = "INSERT INTO Questions_request (user_id, question, point, choix1, choix2, choix3, choix4, response, theme) VALUES (?,?,?,?,?,?,?,?,?)";
 
@@ -714,7 +803,12 @@ public class DBProcess {
             e.printStackTrace();
         }
     }
-
+    /**
+     * Méthode qui vérifie si une question existe dans la base de données.
+     * 
+     * @param question La question à vérifier.
+     * @return True si la question existe, false sinon.
+     */
     public boolean isQuestion(String question) {
         try {
             Connection isQuestion_conn = DriverManager.getConnection(db_url);
@@ -735,7 +829,11 @@ public class DBProcess {
 
         return false;
     }
-
+    /**
+     * Méthode qui supprime une question de la base de données.
+     * 
+     * @param question La question à supprimer.
+     */
     public void removeQuestion(String question) {
         try {
             Connection removeQuestion_conn = DriverManager.getConnection(db_url);
@@ -750,7 +848,11 @@ public class DBProcess {
             e.printStackTrace();
         }
     }
-
+    /**
+     * Méthode qui supprime un duel et toutes les questions associées de la base de données.
+     * 
+     * @param duel_id L'identifiant du duel à supprimer.
+     */
     public void removeQuestionDuel(String duel_id) {
         try {
             Connection removeQuestionDuel_conn = DriverManager.getConnection(db_url);
@@ -769,7 +871,12 @@ public class DBProcess {
             e.printStackTrace();
         }
     }
-
+    /**
+     * Méthode qui vérifie si un utilisateur est administrateur.
+     * 
+     * @param name Le nom de l'utilisateur.
+     * @return True si l'utilisateur est administrateur, false sinon.
+     */
     public boolean isAdmin(String name) {
         try {
             Connection isAdmin_conn = DriverManager.getConnection(db_url);
@@ -790,7 +897,11 @@ public class DBProcess {
 
         return false;
     }
-
+    /**
+     * Méthode qui ajoute un administrateur à la base de données.
+     * 
+     * @param name Le nom de l'administrateur à ajouter.
+     */
     public void addAdmin(String name) {
         try {
             Connection add_admin_conn = DriverManager.getConnection(db_url);
@@ -806,7 +917,11 @@ public class DBProcess {
             e.printStackTrace();
         }
     }
-
+    /**
+     * Méthode qui supprime un administrateur de la base de données.
+     * 
+     * @param name Le nom de l'administrateur à supprimer.
+     */
     public void removeAdmin(String name) {
         try {
             Connection add_admin_conn = DriverManager.getConnection(db_url);
@@ -821,7 +936,12 @@ public class DBProcess {
             e.printStackTrace();
         }
     }
-
+    /**
+     * Méthode qui vérifie si un thème existe dans la base de données.
+     * 
+     * @param theme Le thème à vérifier.
+     * @return True si le thème existe, false sinon.
+     */
     public boolean isTheme(String theme) {
         try {
             Connection isTheme_conn = DriverManager.getConnection(db_url);
@@ -842,7 +962,11 @@ public class DBProcess {
 
         return false;
     }
-
+    /**
+     * Méthode qui renvoie la liste des thèmes utilisés dans la base de données.
+     * 
+     * @return Une chaîne de caractères contenant la liste des thèmes.
+     */
     public String getThemes() {
         List<String> list = new ArrayList<String>();
         String res = "";
@@ -867,7 +991,12 @@ public class DBProcess {
 
         return res;
     }
-
+    /**
+     * Méthode qui renvoie les statistiques d'un utilisateur.
+     * 
+     * @param user_id L'identifiant de l'utilisateur.
+     * @return Un résultat de requête contenant les statistiques de l'utilisateur.
+     */
     public ResultSet getStat(String user_id) {
         try {
             Connection getStat_conn = DriverManager.getConnection(db_url);
@@ -887,7 +1016,16 @@ public class DBProcess {
 
         return null;
     }
-
+    /**
+     * Méthode qui met à jour les statistiques d'un utilisateur.
+     * 
+     * @param user_id L'identifiant de l'utilisateur.
+     * @param questions Le nombre de questions.
+     * @param question_juste Le nombre de questions justes.
+     * @param type_defi Le type de défis.
+     * @param pt_gagne Le nombre de points gagnés.
+     * @param pt_perdu Le nombre de points perdus.
+     */
     public void updateStats(String user_id, int questions, int question_juste, String type_defi, int pt_gagne,
             int pt_perdu) {
 
@@ -923,7 +1061,13 @@ public class DBProcess {
         }
 
     }
-
+    /**
+     * Méthode qui met à jour les statistiques d'un utilisateur en cas d'oubli.
+     * 
+     * @param user_atq L'identifiant de l'utilisateur attaquant.
+     * @param user_cible L'identifiant de l'utilisateur cible.
+     * @param duel_id L'identifiant du duel.
+     */
     public void updateStatsOubli(String user_atq, String user_cible, String duel_id) {
 
         try {
@@ -942,7 +1086,13 @@ public class DBProcess {
         }
 
     }
-
+    /**
+     * Méthode qui met à jour les statistiques d'un utilisateur en cas de victoire.
+     * 
+     * @param user_atq L'identifiant de l'utilisateur attaquant.
+     * @param duel_id L'identifiant du duel.
+     * @param delete True si le duel doit être supprimé.
+     */
     public void updateStatsVictoire(String user_atq, String duel_id, boolean delete) {
 
         try {
@@ -964,7 +1114,13 @@ public class DBProcess {
         }
 
     }
-
+    /**
+     * Met à jour les statistiques de défaites d'un utilisateur.
+     * 
+     * @param user_atq L'identifiant de l'utilisateur.
+     * @param duel_id L'identifiant du duel.
+     * @param delete Si vrai, supprime la question du duel.
+     */
     public void updateStatsDefaite(String user_atq, String duel_id, boolean delete) {
 
         try {
@@ -986,7 +1142,12 @@ public class DBProcess {
         }
 
     }
-
+    /**
+     * Met à jour le vainqueur d'un duel.
+     * 
+     * @param duel_id L'identifiant du duel.
+     * @param vainqueur Le vainqueur du duel.
+     */
     public void updateDuelVainqueur(String duel_id, String vainqueur) {
 
         try {
@@ -1005,7 +1166,13 @@ public class DBProcess {
         }
 
     }
-
+    /**
+     * Vérifie si un duel existe.
+     * 
+     * @param duel_id L'identifiant du duel.
+     * 
+     * @return True si le duel existe, false sinon.
+     */
     public boolean isDuel(String duel_id) {
         try {
             Connection isDuel_conn = DriverManager.getConnection(db_url);
