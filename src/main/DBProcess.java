@@ -1,55 +1,79 @@
 package main;
+
 import java.sql.*;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.UUID;
 import java.util.HashMap;
 
+/**
+ * Cette classe permet de gérer les bases de données SQL et csv.
+ * 
+ * @author Moi
+ * @version 1.0
+ */
 public class DBProcess {
-
+    // URL pour se connecter
     private String db_url = "jdbc:sqlite:src/db/db_jeu.db";
     private String nom_admin = "admin";
 
+    /**
+     * Permet de rajouter un utilisateur dans la bdd.
+     * 
+     * @param avatar Utilisateur à rajouter
+     * @throws SQLException Pour gérer les traitements SQL
+     */
     public void inscrire(Avatar avatar) {
+        // Si l'utilisateur n'existe pas
         if (!isUser(avatar.getName())) {
-            // String url = "jdbc:sqlite:BDD/BDD_MonstreDuSavoir.db";
             try {
                 Connection inscription_conn = DriverManager.getConnection(db_url);
                 Statement inscription_stmt = inscription_conn.createStatement();
 
-         
+                // On ajoute l'utilisateur dans la BDD Joueurs
                 inscription_stmt.executeUpdate(String.format(
-                    "INSERT INTO Joueurs (user_id, name, mdp, pv) VALUES ('%s','%s', '%s', 0)",
-                    avatar.getId(),
-                    avatar.getName(),
-                    avatar.getMdp(),
-                    avatar.getPV()));
+                        "INSERT INTO Joueurs (user_id, name, mdp, pv) VALUES ('%s','%s', '%s', 0)",
+                        avatar.getId(),
+                        avatar.getName(),
+                        avatar.getMdp(),
+                        avatar.getPV()));
 
+                // On rajoute également l'id de l'utilisateur dans les Stats
                 inscription_stmt.executeUpdate(String.format(
-                    "INSERT INTO Stats (user_id) VALUES ('%s')",
-                    avatar.getId()));
+                        "INSERT INTO Stats (user_id) VALUES ('%s')",
+                        avatar.getId()));
 
                 inscription_conn.close();
 
             } catch (SQLException e) {
                 e.printStackTrace();
-
             }
         } else {
             System.out.println("WARNING: Ce nom d'utilisateur existe déjà !");
         }
     }
 
+    /**
+     * Permet de vérifier si l'utilisateur est correct.
+     * 
+     * @param username nom d'utilisateur
+     * @param password mot de passe de l'utilisateur
+     * @return boolean true si le mot de passe de l'utilisateur est correct sinon false
+     * @throws SQLException Pour gérer les traitements SQL
+     */
     public boolean connecter(String username, String password) {
+        // Si l'utilisateur existe
         if (isUser(username)) {
             try {
                 Connection connexion_conn = DriverManager.getConnection(db_url);
                 Statement connexion_stmt = connexion_conn.createStatement();
 
+                // On récupère les utilisateurs dans la BDD Joueurs
                 ResultSet users = connexion_stmt
                         .executeQuery(String.format("SELECT name, mdp FROM Joueurs WHERE name = '%s'", username));
 
                 while (users.next()) {
+                    // Si le mot de passe est correct on retourne true -> connexion réussie
                     if (users.getString("name").equals(username) && users.getString("mdp").equals(password)) {
                         connexion_conn.close();
                         return true;
@@ -57,6 +81,7 @@ public class DBProcess {
 
                 }
                 connexion_conn.close();
+                // dans ce cas, le mot de passe est incorrect
                 System.out.println("Identifiant incorrect !");
 
             } catch (SQLException e) {
@@ -68,14 +93,22 @@ public class DBProcess {
         return false;
     }
 
+    /**
+     * Permet de vérifier si l'utilisateur existe.
+     * 
+     * @param user nom d'utilisateur
+     * @return boolean true si l'utilisateur existe sinon false
+     * @throws SQLException Pour gérer les traitements SQL
+     */
     public boolean isUser(String user) {
         try {
             Connection isUser_conn = DriverManager.getConnection(db_url);
             Statement isUser_stmt = isUser_conn.createStatement();
 
+            // si il existe un utilisateur qui a ce nom, retourne vrai
             if (isUser_stmt.executeQuery(String.format("SELECT name FROM Joueurs WHERE name = '%s'", user)).next()) {
                 isUser_conn.close();
-                return true; // Return true if the user was found
+                return true;
             }
             isUser_conn.close();
         } catch (SQLException e) {
@@ -84,62 +117,90 @@ public class DBProcess {
         return false;
     }
 
+    /**
+     * Permet de récupérer un utilisateur par son id.
+     * 
+     * @param user_id identifiant d'un utilisateur
+     * @return Un avatar si l'utilisateur existe sinon null
+     * @throws SQLException Pour gérer les traitements SQL
+     */
     public Avatar getUserById(String user_id) {
         try {
             Connection getUser_conn = DriverManager.getConnection(db_url);
             Statement getUser_stmt = getUser_conn.createStatement();
 
+            // requete sql pour chercher id d'un utilisateur
             ResultSet resp = getUser_stmt
                     .executeQuery(String.format("SELECT * FROM Joueurs WHERE user_id = '%s'", user_id));
 
+            // si c'est le cas
             if (resp.next()) {
+                // On transforme la réponse SQL en une classe Avatar
                 Avatar avatar = new Avatar(resp.getString("user_id"), resp.getString("name"), resp.getString("mdp"),
                         resp.getInt("pv"));
                 getUser_conn.close();
-                return avatar;// Return true if the user was found
+                return avatar;
             }
             getUser_conn.close();
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-        return new Avatar();
+        // sinon on retourne un utilisateur vide
+        return null;
     }
 
+    /**
+     * Permet de récupérer un utilisateur par son pseudonyme.
+     * 
+     * @param name nom d'utilisateur
+     * @return Un avatar si l'utilisateur existe sinon null
+     * @throws SQLException Pour gérer les traitements SQL
+     */
     public Avatar getUserByName(String name) {
         try {
             Connection getUser_conn = DriverManager.getConnection(db_url);
             Statement getUser_stmt = getUser_conn.createStatement();
 
+            // requête sql pour récupérer les lignes de données qui ont le nom voulu
             ResultSet resp = getUser_stmt
                     .executeQuery(String.format("SELECT * FROM Joueurs WHERE name = '%s'", name));
 
+            // si c'est le cas
             if (resp.next()) {
+                // On transforme la réponse sql en classe Avatar
                 Avatar avatar = new Avatar(resp.getString("user_id"), resp.getString("name"), resp.getString("mdp"),
                         resp.getInt("pv"));
                 getUser_conn.close();
-                return avatar;// Return true if the user was found
+                return avatar;
             }
             getUser_conn.close();
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
+        // Sinon on ne retourne rien
         return null;
     }
 
+    /**
+     * Permet de changer le nom d'un utilisateur.
+     * 
+     * @param user_id id d'utilisateur
+     * @param user nouveau nom d'utilisateur
+     * @throws SQLException Pour gérer les traitements SQL
+     */
     public void updateUsername(String user_id, String new_username) {
 
         try {
             Connection updateUsername_conn = DriverManager.getConnection(db_url);
             Statement updateUsername_stmt = updateUsername_conn.createStatement();
 
+            // requete sql pour modifier le pseudonyme d'un utilisateur
             updateUsername_stmt.executeUpdate(
                     String.format("UPDATE Joueurs SET name = '%s' WHERE user_id = '%s'", new_username, user_id));
 
-                    updateUsername_conn.close();
+            updateUsername_conn.close();
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -147,6 +208,7 @@ public class DBProcess {
 
     }
 
+    
     public List<String> get_classement_points() {
         List<String> classement = new ArrayList<>();
 
@@ -347,7 +409,6 @@ public class DBProcess {
             Connection generate_question_conn = DriverManager.getConnection(db_url);
             Statement generate_question_stmt = generate_question_conn.createStatement();
 
-            
             ResultSet resultat = generate_question_stmt.executeQuery(String
                     .format("SELECT * FROM Questions_request WHERE user_id = '%s' AND status IS NULL ", user_id));
 
@@ -385,9 +446,9 @@ public class DBProcess {
 
             ResultSet resultat = get_question_attente_stmt
                     .executeQuery(
-                        String.format(
-                            "SELECT * FROM Questions_request WHERE status IS NOT NULL AND user_id = '%s'",
-                            user_id));
+                            String.format(
+                                    "SELECT * FROM Questions_request WHERE status IS NOT NULL AND user_id = '%s'",
+                                    user_id));
 
             while (resultat.next()) {
                 int id = resultat.getInt("question_id");
@@ -440,9 +501,10 @@ public class DBProcess {
             Statement updateQuestionRequestStatus_stmt = updateQuestionRequestStatus_conn.createStatement();
 
             updateQuestionRequestStatus_stmt.executeUpdate(
-                    String.format("UPDATE Questions_request SET status = '%s' WHERE question_id = %d", status, question_id));
+                    String.format("UPDATE Questions_request SET status = '%s' WHERE question_id = %d", status,
+                            question_id));
 
-                    updateQuestionRequestStatus_conn.close();
+            updateQuestionRequestStatus_conn.close();
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -543,72 +605,70 @@ public class DBProcess {
     public void addQuestion(Question question) {
         try {
             Connection addQuestionConn = DriverManager.getConnection(db_url);
-            
+
             String requeteSql = "INSERT INTO Questions (question, point, choix1, choix2, choix3, choix4, response, theme) VALUES (?,?,?,?,?,?,?,?)";
-            
+
             PreparedStatement addQuestionStmt = addQuestionConn.prepareStatement(requeteSql);
-            
+
             // Définir les paramètres de la requête
             addQuestionStmt.setString(1, question.getQuestion()); // Pour le champ question
             addQuestionStmt.setInt(2, question.getPoints()); // Pour le champ point
             addQuestionStmt.setString(3, question.getChoices().get(0)); // Pour le champ choix1
             addQuestionStmt.setString(4, question.getChoices().get(1)); // Pour le champ choix2
-            if (question.getChoices().size() >= 3) 
-            addQuestionStmt.setString(5, question.getChoices().size() >= 3? question.getChoices().get(2) : null);
-            addQuestionStmt.setString(6, question.getChoices().size() >= 4? question.getChoices().get(3) : null);
+            if (question.getChoices().size() >= 3)
+                addQuestionStmt.setString(5, question.getChoices().size() >= 3 ? question.getChoices().get(2) : null);
+            addQuestionStmt.setString(6, question.getChoices().size() >= 4 ? question.getChoices().get(3) : null);
             addQuestionStmt.setString(7, question.getResponse()); // Pour le champ response
             addQuestionStmt.setString(8, question.getTheme()); // Pour le champ theme
-            
+
             // Exécuter la requête
             addQuestionStmt.executeUpdate();
-            
+
             addQuestionConn.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-    
 
     public void addQuestions(List<Question> questions) {
         String sql = "INSERT INTO Questions (question, point, choix1, choix2, choix3, choix4, response, theme) VALUES (?,?,?,?,?,?,?,?)";
-    
+
         try (Connection conn = DriverManager.getConnection(db_url);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-    
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
             for (Question question : questions) {
                 pstmt.setString(1, question.getQuestion()); // Pour le champ question
                 pstmt.setInt(2, question.getPoints()); // Pour le champ point
                 pstmt.setString(3, question.getChoices().get(0)); // Pour le champ choix1
                 pstmt.setString(4, question.getChoices().get(1)); // Pour le champ choix2
-                pstmt.setString(5, question.getChoices().size() >= 3? question.getChoices().get(2) : null);
-                pstmt.setString(6, question.getChoices().size() >= 4? question.getChoices().get(3) : null);
+                pstmt.setString(5, question.getChoices().size() >= 3 ? question.getChoices().get(2) : null);
+                pstmt.setString(6, question.getChoices().size() >= 4 ? question.getChoices().get(3) : null);
                 pstmt.setString(7, question.getResponse()); // Pour le champ response
                 pstmt.setString(8, question.getTheme()); // Pour le champ theme
-    
+
                 pstmt.addBatch(); // Ajoute la requête à la batch pour exécution ultérieure
             }
-    
+
             pstmt.executeBatch(); // Exécute toutes les requêtes en batch
-    
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-    
 
     public void addQuestionDuel(List<Question> questions, String userAtq, String userCible, int scoreAtq, int nbJours) {
         String sqlInsertions = "INSERT INTO Questions_duel (duel_id, question_id) VALUES (?,?)";
         String sqlDuel = "INSERT INTO duel (duel_id, user_atq, user_cible, temps_limite, score_atq) VALUES (?,?,?,?,?)";
-    
+
         try (Connection conn = DriverManager.getConnection(db_url);
-             PreparedStatement pstmtQuestions = conn.prepareStatement(sqlInsertions);
-             PreparedStatement pstmtDuel = conn.prepareStatement(sqlDuel)) {
-    
+                PreparedStatement pstmtQuestions = conn.prepareStatement(sqlInsertions);
+                PreparedStatement pstmtDuel = conn.prepareStatement(sqlDuel)) {
+
             String duelId = UUID.randomUUID().toString();
             while (isDuel(duelId)) {
                 duelId = UUID.randomUUID().toString();
             }
-    
+
             // Insérer les questions dans Questions_duel
             for (Question question : questions) {
                 pstmtQuestions.setString(1, duelId);
@@ -616,7 +676,7 @@ public class DBProcess {
                 pstmtQuestions.addBatch();
             }
             pstmtQuestions.executeBatch();
-    
+
             // Enregistrer le duel
             pstmtDuel.setString(1, duelId);
             pstmtDuel.setString(2, userAtq);
@@ -624,38 +684,36 @@ public class DBProcess {
             pstmtDuel.setTimestamp(4, new Timestamp(System.currentTimeMillis() + 24 * 60 * 60 * 1000 * nbJours));
             pstmtDuel.setInt(5, scoreAtq);
             pstmtDuel.executeUpdate();
-    
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-    
 
     public void addQuestionRequest(Question question, String userId) {
         String sql = "INSERT INTO Questions_request (user_id, question, point, choix1, choix2, choix3, choix4, response, theme) VALUES (?,?,?,?,?,?,?,?,?)";
-    
+
         try (Connection conn = DriverManager.getConnection(db_url);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-    
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
             // Définir les paramètres de la requête
             pstmt.setString(1, userId); // Pour le champ user_id
             pstmt.setString(2, question.getQuestion()); // Pour le champ question
             pstmt.setInt(3, question.getPoints()); // Pour le champ point
             pstmt.setString(4, question.getChoices().get(0)); // Pour le champ choix1
             pstmt.setString(5, question.getChoices().get(1)); // Pour le champ choix2
-            pstmt.setString(6, question.getChoices().size() >= 3? question.getChoices().get(2) : null);
-            pstmt.setString(7, question.getChoices().size() >= 4? question.getChoices().get(3) : null);
+            pstmt.setString(6, question.getChoices().size() >= 3 ? question.getChoices().get(2) : null);
+            pstmt.setString(7, question.getChoices().size() >= 4 ? question.getChoices().get(3) : null);
             pstmt.setString(8, question.getResponse()); // Pour le champ response
             pstmt.setString(9, question.getTheme()); // Pour le champ theme
-    
+
             // Exécuter la requête
             pstmt.executeUpdate();
-    
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-    
 
     public boolean isQuestion(String question) {
         try {
