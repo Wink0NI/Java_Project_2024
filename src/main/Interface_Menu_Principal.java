@@ -5,9 +5,9 @@ import java.util.Scanner;
 import main.process.SysGestion;
 
 import java.util.List;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
+
 /**
  * Classe représentant l'interface principale du jeu.
  * 
@@ -16,6 +16,7 @@ public class Interface_Menu_Principal {
         Scanner scanner = new Scanner(System.in);
         private SysGestion gestion;
         private DBProcess dbProcess;
+        
         /**
          * Constructeur de la classe Interface_Menu_Principal.
          * 
@@ -23,11 +24,6 @@ public class Interface_Menu_Principal {
          * @version 1.0
          */
         public Interface_Menu_Principal() {
-                /**
-                 * Méthode pour initialiser les objets de la classe.
-                * 
-                 * @param none
-                */
                 dbProcess = new DBProcess();
                 gestion = new SysGestion();
         }

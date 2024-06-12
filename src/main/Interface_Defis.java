@@ -16,10 +16,14 @@ public class Interface_Defis {
 
     protected DBProcess dbProcess;
 
+    /**
+     * Constructeur pour initialiser une instance d'Interface_Defis.
+     */
     public Interface_Defis() {
         dbProcess = new DBProcess(); // Initialize dbProcess here
         gestion = new SysGestion();
     }
+
     /**
      * Affiche le menu des défis et gère les actions de l'utilisateur.
      * 
@@ -138,7 +142,7 @@ public class Interface_Defis {
         }
     }
     /**
-     * Gère le processus d'un défi.
+     * Gère le processus d'un défi vs.
      * 
      * @param user l'avatar de l'utilisateur courant
      * @param defi les informations du défi en cours

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+
 /**
  * Classe représentant l'interface de menu pour les administrateurs.
  *
@@ -18,6 +19,7 @@ public class Interface_Menu_Administrateur {
     Scanner scanner = new Scanner(System.in);
     private SysGestion gestion;
     private DBProcess dbProcess;
+
     /**
      * Constructeur de la classe Interface_Menu_Administrateur.
      * Initialise la variable dbProcess avec une nouvelle instance de DBProcess.
@@ -26,6 +28,7 @@ public class Interface_Menu_Administrateur {
     public Interface_Menu_Administrateur() {
         dbProcess = new DBProcess();
     }
+    
     /**
      * Méthode qui affiche le menu administrateur.
      *

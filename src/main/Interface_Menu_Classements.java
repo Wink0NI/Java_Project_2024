@@ -4,10 +4,8 @@ import java.util.Scanner;
 import main.process.SysGestion;
 
 import java.util.List;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.sql.*;
-import java.util.InputMismatchException;
+
 /**
  * Classe représentant l'interface de menu pour les classements.
  *
@@ -17,6 +15,7 @@ public class Interface_Menu_Classements {
     DBProcess dbProcess = new DBProcess();
 
     Scanner scanner = new Scanner(System.in);
+    
     /**
      * Méthode qui affiche le menu des classements.
      *

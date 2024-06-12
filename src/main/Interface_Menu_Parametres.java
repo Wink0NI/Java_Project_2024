@@ -6,7 +6,7 @@ import main.process.SysGestion;
 import java.util.List;
 import java.util.ArrayList;
 import java.sql.*;
-import java.util.InputMismatchException;
+
 /**
  * Classe représentant l'interface de menu pour les paramètres.
  *
@@ -18,6 +18,7 @@ public class Interface_Menu_Parametres {
     Interface_Menu_Classements classements = new Interface_Menu_Classements();
 
     Scanner scanner = new Scanner(System.in);
+
     /**
      * Méthode qui affiche le menu des paramètres.
      *
@@ -86,6 +87,7 @@ public class Interface_Menu_Parametres {
         }
 
     }
+    
     /**
      * Méthode qui affiche les statistiques de l'utilisateur.
      *
