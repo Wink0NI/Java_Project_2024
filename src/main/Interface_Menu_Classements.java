@@ -77,7 +77,7 @@ public class Interface_Menu_Classements {
                 } else {
                     System.out
                             .println(String.format("- %d: %s - %s %s", classement.indexOf(user) + 1, user_classment.getName(),
-                            user_classment.getPV(), user_classment.getPV() > 1 ? "victoires" : "victoire"));
+                            user_classment.getPV(), user_classment.getPV() > 1 ? "points" : "point"));
                 }
             }
             System.out.println("Cliquez sur Entrée pour revenir...");
