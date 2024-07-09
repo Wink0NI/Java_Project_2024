@@ -1,4 +1,5 @@
 package main;
+
 import java.util.UUID;
 
 /**
@@ -9,18 +10,19 @@ public class Avatar {
     private String name; // Nom de l'avatar
     private String mdp; // Mot de passe de l'avatar
     private int pv; // Points de vie de l'avatar
-    private DBProcess dbProcess = new DBProcess();
+    private DBProcess dbProcess = new DBProcess(); // Instance de DBProcess pour les opérations de base de données
 
     /**
      * Constructeur pour créer un nouvel avatar avec un nom et un mot de passe.
      * @param name Le nom de l'avatar.
      * @param mdp Le mot de passe de l'avatar.
      */
-    public Avatar(String name, String mdp ) {
-        this.id  = UUID.randomUUID().toString(); // Génère un identifiant unique pour l'avatar.
-        while (dbProcess.isUser(this.id)) this.id = UUID.randomUUID().toString();
-        
-            
+    public Avatar(String name, String mdp) {
+        this.id = UUID.randomUUID().toString(); // Génère un identifiant unique pour l'avatar.
+        while (dbProcess.isUser(this.id)) { // Vérifie si l'identifiant existe déjà dans la base de données
+            this.id = UUID.randomUUID().toString(); // Génère un nouvel identifiant si nécessaire
+        }
+
         this.name = name; // Initialise le nom de l'avatar avec la valeur passée en paramètre.
         this.mdp = mdp; // Initialise le mot de passe de l'avatar avec la valeur passée en paramètre.
         this.pv = 0; // Initialise les points de vie de l'avatar à 0.
@@ -34,7 +36,7 @@ public class Avatar {
      * @param pv Les points de vie de l'avatar.
      */
     public Avatar(String id, String name, String mdp, int pv) {
-        this.id  = id; // Initialise l'identifiant de l'avatar avec la valeur passée en paramètre.
+        this.id = id; // Initialise l'identifiant de l'avatar avec la valeur passée en paramètre.
         this.name = name; // Initialise le nom de l'avatar avec la valeur passée en paramètre.
         this.mdp = mdp; // Initialise le mot de passe de l'avatar avec la valeur passée en paramètre.
         this.pv = pv; // Initialise les points de vie de l'avatar avec la valeur passée en paramètre.
@@ -77,3 +79,4 @@ public class Avatar {
         return mdp;
     }
 }
+
