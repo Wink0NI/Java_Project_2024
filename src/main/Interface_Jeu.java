@@ -8,7 +8,7 @@ import java.util.List;
  */
 public class Interface_Jeu {
 
-    Scanner scanner = new Scanner(System.in); // Scanner pour lire les entrées utilisateur
+    private Scanner scanner = new Scanner(System.in); // Scanner pour lire les entrées utilisateur
     private SysGestion gestion; // Instance de SysGestion pour gérer les opérations du système
 
     private DBProcess dbProcess; // Instance de DBProcess pour les opérations liées à la base de données

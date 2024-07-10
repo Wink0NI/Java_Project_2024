@@ -13,7 +13,7 @@ import java.io.FileNotFoundException;
  */
 public class Interface_Menu_Administrateur {
     // Instance de Scanner pour lire les entrées de l'utilisateur
-    Scanner scanner = new Scanner(System.in);
+    private Scanner scanner = new Scanner(System.in);
     private SysGestion gestion;
     private DBProcess dbProcess;
 
