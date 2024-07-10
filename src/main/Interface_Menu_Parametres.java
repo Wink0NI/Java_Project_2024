@@ -13,16 +13,16 @@ import main.process.*;
  */
 public class Interface_Menu_Parametres {
     // Instance de SysGestion pour la gestion des tâches (comme le nettoyage de l'écran et l'attente)
-    SysGestion gestion = new SysGestion();
+    private SysGestion gestion = new SysGestion();
 
     // Instance de DBProcess pour l'accès aux données de la base de données
-    DBProcess dbProcess = new DBProcess();
+    private DBProcess dbProcess = new DBProcess();
 
     // Instance de Interface_Menu_Classements pour accéder aux options de classement
-    Interface_Menu_Classements classements = new Interface_Menu_Classements();
+    private Interface_Menu_Classements classements = new Interface_Menu_Classements();
 
     // Scanner pour lire les entrées de l'utilisateur
-    Scanner scanner = new Scanner(System.in);
+    private Scanner scanner = new Scanner(System.in);
 
     /**
      * Méthode qui affiche le menu des paramètres.

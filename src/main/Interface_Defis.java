@@ -10,10 +10,10 @@ import java.sql.*;
  */
 public class Interface_Defis {
 
-    Scanner scanner = new Scanner(System.in); // Scanner pour lire les entrées utilisateur
+    private Scanner scanner = new Scanner(System.in); // Scanner pour lire les entrées utilisateur
     private SysGestion gestion; // Instance de SysGestion pour gérer les opérations du système
 
-    protected DBProcess dbProcess; // Instance de DBProcess pour les opérations liées à la base de données
+    private DBProcess dbProcess; // Instance de DBProcess pour les opérations liées à la base de données
 
     /**
      * Constructeur pour initialiser une instance d'Interface_Defis.

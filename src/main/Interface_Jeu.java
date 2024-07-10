@@ -11,9 +11,9 @@ public class Interface_Jeu {
     Scanner scanner = new Scanner(System.in); // Scanner pour lire les entrées utilisateur
     private SysGestion gestion; // Instance de SysGestion pour gérer les opérations du système
 
-    protected DBProcess dbProcess; // Instance de DBProcess pour les opérations liées à la base de données
+    private DBProcess dbProcess; // Instance de DBProcess pour les opérations liées à la base de données
 
-    protected Interface_Defis interface_Defis; // Interface pour les défis
+    private Interface_Defis interface_Defis; // Interface pour les défis
 
     /**
      * Constructeur pour initialiser une instance d'Interface_Jeu.

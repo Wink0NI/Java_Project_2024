@@ -7,10 +7,10 @@ import main.process.*;
  * Cette classe gère l'interface de connexion pour le jeu "Question pour un champion".
  */
 public class Interface_Connexion {
-    protected SysGestion gestion; // Gestion du système (probablement pour des fonctions utilitaires)
-    protected DBProcess dbProcess; // Processus de gestion de la base de données
+    private SysGestion gestion; // Gestion du système (probablement pour des fonctions utilitaires)
+    private DBProcess dbProcess; // Processus de gestion de la base de données
 
-    protected Interface_Menu_Principal menu_Principal; // Interface du menu principal du jeu
+    private Interface_Menu_Principal menu_Principal; // Interface du menu principal du jeu
 
     /**
      * Constructeur pour initialiser une instance d'Interface_Connexion.

@@ -11,13 +11,13 @@ import main.process.*;
  */
 public class Interface_Menu_Classements {
     // Instance de SysGestion pour la gestion des tâches
-    SysGestion gestion = new SysGestion();
+    private SysGestion gestion = new SysGestion();
 
     // Instance de DBProcess pour l'accès aux données de la base
-    DBProcess dbProcess = new DBProcess();
+    private DBProcess dbProcess = new DBProcess();
 
     // Scanner pour lire les entrées de l'utilisateur
-    Scanner scanner = new Scanner(System.in);
+    private Scanner scanner = new Scanner(System.in);
     
     /**
      * Méthode qui affiche le menu des classements.
