@@ -5,6 +5,7 @@ import java.util.Scanner;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Random;
+import main.process.*;
 
 /**
  * Classe représentant l'interface principale du jeu.
