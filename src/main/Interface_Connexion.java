@@ -70,8 +70,12 @@ public class Interface_Connexion {
         System.out.println("Confirmer votre mot de passe:");
         String mdp_verif = scanner.nextLine(); // Lire la confirmation du mot de passe
 
+        if (avatar.contains("?") || mdp.contains("?")) {
+            System.out.println("Identifiant non autorisée, prsence de caractère non autorisée");
+            gestion.wait(2000); // Attendre 2 secondes avant de continuer
+        }
         // Vérifier si le mot de passe et sa confirmation correspondent
-        if (mdp.equals(mdp_verif)) {
+        else if (mdp.equals(mdp_verif)) {
             // Inscrire le nouvel avatar dans la base de données
             dbProcess.inscrire(new Avatar(avatar, mdp));
             System.out.println("Inscription réussie !");
@@ -103,5 +107,6 @@ public class Interface_Connexion {
         } 
         gestion.wait(2000); // Attendre 2 secondes avant de continuer
     }
+    
 }
 

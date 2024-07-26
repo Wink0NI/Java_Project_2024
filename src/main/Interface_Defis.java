@@ -166,7 +166,7 @@ public class Interface_Defis {
                 String resp = scanner.nextLine();
 
                 // Vérifie si la réponse est correcte
-                if (resp.equals(question.getResponse())) {
+                if (resp.equalsIgnoreCase(question.getResponse())) {
                     System.out.println("Bonne réponse !");
                     score++;
                     pt_gagne += question.getPoints();

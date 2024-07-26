@@ -138,12 +138,34 @@ public class Interface_Jeu {
                 String resp = scanner.nextLine();
 
                 // Vérifie si la réponse est correcte
-                if (resp.equals(question.getResponse())) {
+                if (resp.equalsIgnoreCase(question.getResponse())) {
                     System.out.println("Bonne réponse !");
                     score++;
                     pt_gagne += question.getPoints();
                     currentPV += question.getPoints();
-                } else {
+                    continue;
+                }
+                
+                try {
+                    
+                    if (question.getChoices().get(Integer.parseInt(resp)-1).equals(question.getResponse())) {
+                        System.out.println("Bonne réponse !");
+                        score++;
+                        pt_gagne += question.getPoints();
+                        currentPV += question.getPoints();
+                        continue;
+                    } else {
+                            System.out.println("Faux ! Réponse correcte: " + question.getResponse());
+                            if (currentPV - question.getPoints() < 0) {
+                                currentPV = 0;
+                            } else {
+                                currentPV -= question.getPoints();
+                            }
+                            pt_perdu += question.getPoints();
+
+                            gestion.wait(2000); // Attend 2 secondes avant de passer à la question suivante
+                        }
+                } catch (Exception e) {
                     System.out.println("Faux ! Réponse correcte: " + question.getResponse());
                     if (currentPV - question.getPoints() < 0) {
                         currentPV = 0;
@@ -189,7 +211,7 @@ public class Interface_Jeu {
     private void defi(Avatar user) {
 
         String theme = "";
-        System.out.println("Défi");
+        System.out.println("Défi VS");
         System.out.println(
                 "-----------------------------------------------------------------------------------------------------------------------------------------------------------");
 
@@ -201,10 +223,12 @@ public class Interface_Jeu {
             cible = scanner.nextLine();
             if (!dbProcess.isUser(cible))
                 System.out.println("ERREUR: Cet utilisateur n'existe pas.");
+            if (!user.getName().equalsIgnoreCase(cible))
+                System.out.println("ERREUR: Vous ne pouvez pas défier vous-même.");
             else {
                 System.out.println("Confirmer: o/n");
 
-                if (scanner.nextLine().toLowerCase().equals("o")) {
+                if (scanner.nextLine().equalsIgnoreCase("o")) {
                     break;
                 }
             }
@@ -282,14 +306,37 @@ public class Interface_Jeu {
                 }
                 System.out.print("Réponse -> ");
                 String resp = scanner.nextLine();
-
+                
                 // Vérifie si la réponse est correcte
-                if (resp.equals(question.getResponse())) {
+                if (resp.equalsIgnoreCase(question.getResponse())) {
                     System.out.println("Bonne réponse !");
                     score++;
                     pt_gagne += question.getPoints();
                     currentPV += question.getPoints();
-                } else {
+                    continue;
+                }
+                
+                try {
+                    
+                    if (question.getChoices().get(Integer.parseInt(resp)-1).equals(question.getResponse())) {
+                        System.out.println("Bonne réponse !");
+                        score++;
+                        pt_gagne += question.getPoints();
+                        currentPV += question.getPoints();
+                        continue;
+                    } else {
+                        System.out.println(resp);
+                            System.out.println("Faux ! Réponse correcte: " + question.getResponse());
+                            if (currentPV - question.getPoints() < 0) {
+                                currentPV = 0;
+                            } else {
+                                currentPV -= question.getPoints();
+                            }
+                            pt_perdu += question.getPoints();
+
+                            gestion.wait(2000); // Attend 2 secondes avant de passer à la question suivante
+                        }
+                } catch (Exception e) {
                     System.out.println("Faux ! Réponse correcte: " + question.getResponse());
                     if (currentPV - question.getPoints() < 0) {
                         currentPV = 0;

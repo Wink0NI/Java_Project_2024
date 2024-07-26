@@ -8,11 +8,13 @@ import main.process.*;
 
 /**
  * Classe représentant l'interface de menu pour les paramètres.
- * Ce menu permet à un utilisateur de voir son profil, proposer des questions, afficher les questions en attente,
+ * Ce menu permet à un utilisateur de voir son profil, proposer des questions,
+ * afficher les questions en attente,
  * changer son nom, et accéder au classement des joueurs.
  */
 public class Interface_Menu_Parametres {
-    // Instance de SysGestion pour la gestion des tâches (comme le nettoyage de l'écran et l'attente)
+    // Instance de SysGestion pour la gestion des tâches (comme le nettoyage de
+    // l'écran et l'attente)
     private SysGestion gestion = new SysGestion();
 
     // Instance de DBProcess pour l'accès aux données de la base de données
@@ -26,7 +28,8 @@ public class Interface_Menu_Parametres {
 
     /**
      * Méthode qui affiche le menu des paramètres.
-     * Ce menu offre diverses options telles que voir le profil, proposer une question, voir les questions en attente,
+     * Ce menu offre diverses options telles que voir le profil, proposer une
+     * question, voir les questions en attente,
      * consulter les classements et changer le nom d'utilisateur.
      *
      * @param user_id l'identifiant de l'utilisateur connecté
@@ -55,9 +58,12 @@ public class Interface_Menu_Parametres {
             }
 
             // Options supplémentaires disponibles pour tous les utilisateurs
-            System.out.println("U - Statut des questions...");
+            if (!dbProcess.isAdmin(user.getName())) {
+                System.out.println("U - Statut des questions...");
+            }
             System.out.println("C - Classements...");
             System.out.println("N - Changer le nom de l'utilisateur...");
+            System.out.println("A - Changer le mot de passe de l'utilisateur...");
             System.out.println("T - Retour");
 
             // Lecture du choix de l'utilisateur et appel de la méthode appropriée
@@ -73,13 +79,18 @@ public class Interface_Menu_Parametres {
                     break;
 
                 case "O":
-                    // Permet d'ajouter ou de proposer une question en fonction du rôle de l'utilisateur
+                    // Permet d'ajouter ou de proposer une question en fonction du rôle de
+                    // l'utilisateur
                     ajouter_question(user);
                     break;
 
                 case "U":
-                    // Affiche les questions en attente d'approbation
-                    afficher_questions_attente(user);
+                    if (!dbProcess.isAdmin(user.getName())) {
+                        // Affiche les questions en attente d'approbation
+                        afficher_questions_attente(user);
+                    } else {
+                        System.out.println("Commande saisie invalide...");
+                    }
                     break;
 
                 case "C":
@@ -97,6 +108,10 @@ public class Interface_Menu_Parametres {
                     // Permet de changer le nom d'utilisateur
                     changer_utilisateur(user);
                     break;
+                case "A":
+                    // Permet de changer le mot de passe d'utilisateur
+                    changer_mdp(user);
+                    break;
 
                 default:
                     // Gestion d'une commande invalide
@@ -108,7 +123,8 @@ public class Interface_Menu_Parametres {
 
     /**
      * Méthode qui affiche les statistiques de l'utilisateur.
-     * Cette méthode récupère les statistiques de l'utilisateur à partir de la base de données et les affiche.
+     * Cette méthode récupère les statistiques de l'utilisateur à partir de la base
+     * de données et les affiche.
      *
      * @param user l'utilisateur dont les statistiques sont affichées
      */
@@ -138,11 +154,14 @@ public class Interface_Menu_Parametres {
 
             // Affichage des statistiques de défi solo
             System.out.println(String.format("Nombre de défis solo joué: %d", stats.getInt("defi_solo")));
-            System.out.println(String.format("Questions répondues en défi solo: %d", stats.getInt("tot_question_defi_solo")));
-            System.out.println(String.format("Questions répondues juste en défi solo: %d", stats.getInt("jus_question_defi_solo")));
+            System.out.println(
+                    String.format("Questions répondues en défi solo: %d", stats.getInt("tot_question_defi_solo")));
+            System.out.println(String.format("Questions répondues juste en défi solo: %d",
+                    stats.getInt("jus_question_defi_solo")));
             System.out.println(String.format("Moyenne des questions répondues juste en défi solo: %.2f",
                     stats.getInt("tot_question_defi_solo") == 0 ? 0
-                            : (double) (stats.getInt("jus_question_defi_solo")) / (stats.getInt("tot_question_defi_solo")) * 100.0)
+                            : (double) (stats.getInt("jus_question_defi_solo"))
+                                    / (stats.getInt("tot_question_defi_solo")) * 100.0)
                     + "%");
             System.out.println(String.format("Points gagnés en défi solo: %d", stats.getInt("pt_gagne_defi_solo")));
             System.out.println(String.format("Points perdus en défi solo: %d", stats.getInt("pt_perdu_defi_solo")));
@@ -152,17 +171,21 @@ public class Interface_Menu_Parametres {
 
             // Affichage des statistiques de défi vs
             System.out.println(String.format("Nombre de défis vs joué: %d", stats.getInt("defi_vs")));
-            System.out.println(String.format("Questions répondues en défi vs: %d", stats.getInt("tot_question_defi_vs")));
-            System.out.println(String.format("Questions répondues juste en défi vs: %d", stats.getInt("jus_question_defi_vs")));
+            System.out
+                    .println(String.format("Questions répondues en défi vs: %d", stats.getInt("tot_question_defi_vs")));
+            System.out.println(
+                    String.format("Questions répondues juste en défi vs: %d", stats.getInt("jus_question_defi_vs")));
             System.out.println(String.format("Moyenne des questions répondues juste en défi vs: %.2f",
                     stats.getInt("tot_question_defi_vs") == 0 ? 0
-                            : (double) (stats.getInt("jus_question_defi_vs")) / (stats.getInt("tot_question_defi_vs")) * 100.0)
+                            : (double) (stats.getInt("jus_question_defi_vs")) / (stats.getInt("tot_question_defi_vs"))
+                                    * 100.0)
                     + "%");
             System.out.println(String.format("Points gagnés en défi vs: %d", stats.getInt("pt_gagne_defi_vs")));
             System.out.println(String.format("Points perdus en défi vs: %d", stats.getInt("pt_perdu_defi_vs")));
 
             System.out.println(String.format("Matchs réalisés en défi vs: %d", stats.getInt("match_vs")));
-            System.out.println(String.format("Victoires de match réalisés en défi vs: %d", stats.getInt("victoire_vs")));
+            System.out
+                    .println(String.format("Victoires de match réalisés en défi vs: %d", stats.getInt("victoire_vs")));
             System.out.println(String.format("Pourcentage de victoire en match vs: %.2f",
                     stats.getInt("match_vs") == 0 ? 0
                             : (double) (stats.getInt("victoire_vs")) / (stats.getInt("match_vs")) * 100.0)
@@ -172,7 +195,8 @@ public class Interface_Menu_Parametres {
                     "----------------------------------------------------------------------------------------------------------------------");
 
             // Affichage des statistiques globales
-            System.out.println(String.format("Nombre de défis effectués: %d", stats.getInt("defi_solo") + stats.getInt("defi_vs")));
+            System.out.println(String.format("Nombre de défis effectués: %d",
+                    stats.getInt("defi_solo") + stats.getInt("defi_vs")));
             System.out.println(String.format("Questions répondues: %d",
                     stats.getInt("tot_question_defi_solo") + stats.getInt("tot_question_defi_vs")));
             System.out.println(String.format("Questions répondues juste: %d",
@@ -207,7 +231,8 @@ public class Interface_Menu_Parametres {
 
     /**
      * Méthode qui permet de voir le profil d'un utilisateur.
-     * L'utilisateur doit entrer le nom de l'utilisateur dont il souhaite voir le profil.
+     * L'utilisateur doit entrer le nom de l'utilisateur dont il souhaite voir le
+     * profil.
      */
     public void voir_profil() {
         System.out.println("Quel utilisateur voulez-vous voir ?");
@@ -226,8 +251,10 @@ public class Interface_Menu_Parametres {
 
     /**
      * Méthode qui permet d'ajouter une question.
-     * Si l'utilisateur est un administrateur, il peut ajouter une question directement.
-     * Sinon, il peut seulement proposer une question pour qu'un administrateur l'examine.
+     * Si l'utilisateur est un administrateur, il peut ajouter une question
+     * directement.
+     * Sinon, il peut seulement proposer une question pour qu'un administrateur
+     * l'examine.
      *
      * @param user l'utilisateur qui ajoute ou propose une question
      */
@@ -305,7 +332,8 @@ public class Interface_Menu_Parametres {
             dbProcess.addQuestion(new Question(question, Options_reponses, reponse, nb_point, theme_question));
             System.out.println("SUCCES: Question ajoutée avec succès.");
         } else {
-            // Si l'utilisateur n'est pas administrateur, il propose une question pour examen
+            // Si l'utilisateur n'est pas administrateur, il propose une question pour
+            // examen
             dbProcess.addQuestionRequest(new Question(question, Options_reponses, reponse, nb_point, theme_question),
                     user.getId());
             System.out.println(
@@ -318,7 +346,8 @@ public class Interface_Menu_Parametres {
 
     /**
      * Méthode qui affiche les questions en attente.
-     * L'utilisateur peut voir les questions qu'il a proposées et qui sont en attente d'examen.
+     * L'utilisateur peut voir les questions qu'il a proposées et qui sont en
+     * attente d'examen.
      *
      * @param user l'utilisateur dont les questions en attente sont affichées
      */
@@ -353,7 +382,8 @@ public class Interface_Menu_Parametres {
 
     /**
      * Méthode qui permet de changer le nom d'un utilisateur.
-     * L'utilisateur entre un nouveau nom, et le système vérifie sa validité avant de le mettre à jour dans la base de données.
+     * L'utilisateur entre un nouveau nom, et le système vérifie sa validité avant
+     * de le mettre à jour dans la base de données.
      *
      * @param user l'utilisateur dont le nom est changé
      */
@@ -362,28 +392,62 @@ public class Interface_Menu_Parametres {
                 "----------------------------------------------------------------------------------------------------------------------");
 
         System.out.println("Nouveau nom: ");
-        while (true) {
-            String nouveau_nom = scanner.nextLine();
-            if (nouveau_nom.equals("")) {
-                // Vérification que le nom n'est pas vide
-                System.out.println("Erreur: Le nom n'est pas autorisé.");
-            } else if (user.getName().equals(nouveau_nom)) {
-                // Vérification que le nouveau nom est différent de l'ancien
-                System.out.println("Nom non modifié.");
-                gestion.wait(3000); // Attendre 3 secondes avant de retourner au menu
-                break;
-            } else if (dbProcess.getUserByName(nouveau_nom) != null) {
-                // Vérification que le nom n'existe pas déjà
-                System.out.println("Erreur: " + nouveau_nom + " existe déjà...");
-            } else {
-                // Mise à jour du nom d'utilisateur dans la base de données
-                System.out.println(
-                    "SUCCESS: Nouveau nom: " + nouveau_nom
-                );
-                dbProcess.updateUsername(user.getName(), nouveau_nom);
-                gestion.wait(3000); // Attendre 3 secondes avant de retourner au menu
-                break;
-            }
+        String nouveau_nom = scanner.nextLine();
+
+        if (nouveau_nom.equals("")) {
+            // Vérification que le nom n'est pas vide
+            System.out.println("Erreur: Le nom n'est pas autorisé.");
+        } else if (user.getName().equals(nouveau_nom)) {
+            // Vérification que le nouveau nom est différent de l'ancien
+            System.out.println("Nom non modifié.");
+
+        } else if (dbProcess.getUserByName(nouveau_nom) != null) {
+            // Vérification que le nom n'existe pas déjà
+            System.out.println("Erreur: " + nouveau_nom + " existe déjà...");
+        } else {
+            // Mise à jour du nom d'utilisateur dans la base de données
+            System.out.println(
+                    "SUCCESS: Nouveau nom: " + nouveau_nom);
+            dbProcess.updateUsername(user.getId(), nouveau_nom);
+
         }
+        gestion.wait(3000); // Attendre 3 secondes avant de retourner au menu
+
+    }
+
+    /**
+     * Méthode qui permet de changer le mot de passe d'un utilisateur.
+     * L'utilisateur entre le mdp actuel et ensuite son nouveau mdp, et le système
+     * vérifie sa validité avant de le mettre à jour dans la base de données.
+     *
+     * @param user l'utilisateur dont le mdp est changé
+     */
+    private void changer_mdp(Avatar user) {
+        System.out.println(
+                "----------------------------------------------------------------------------------------------------------------------");
+
+        System.out.println("Mot de passe actuel: ");
+        if (!scanner.nextLine().equals(user.getMdp())) {
+            // Vérification que le nom n'est pas vide
+            System.out.println("Erreur: Le mot de passe actuel n'est pas valide.");
+            gestion.wait(3000); // Attendre 3 secondes avant de retourner au menu
+            return;
+        }
+        System.out.println("Nouveau mot de passe: ");
+        String nouveau_mdp = scanner.nextLine();
+
+        System.out.println("Confirmer le nouveau mot de passe: ");
+
+        if (scanner.nextLine().equalsIgnoreCase(nouveau_mdp)) {
+            // Vérification que le nouveau nom est différent de l'ancien
+            System.out.println("SUCCESS: Nouveau mdp mis à jour avec succès.");
+            dbProcess.updateMDP(user.getId(), nouveau_mdp);
+
+        } else {
+            // Mise à jour du nom d'utilisateur dans la base de données
+            System.out.println("ERROR: Mot de passe vérifié incorrect");
+        }
+        gestion.wait(3000); // Attendre 3 secondes avant de retourner au menu
+
     }
 }
