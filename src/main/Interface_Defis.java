@@ -171,7 +171,29 @@ public class Interface_Defis {
                     score++;
                     pt_gagne += question.getPoints();
                     currentPV += question.getPoints();
-                } else {
+                    continue;
+                }
+                
+                try {
+                    
+                    if (question.getChoices().get(Integer.parseInt(resp)-1).equals(question.getResponse())) {
+                        System.out.println("Bonne réponse !");
+                        score++;
+                        pt_gagne += question.getPoints();
+                        currentPV += question.getPoints();
+                        continue;
+                    } else {
+                            System.out.println("Faux ! Réponse correcte: " + question.getResponse());
+                            if (currentPV - question.getPoints() < 0) {
+                                currentPV = 0;
+                            } else {
+                                currentPV -= question.getPoints();
+                            }
+                            pt_perdu += question.getPoints();
+
+                            gestion.wait(2000); // Attend 2 secondes avant de passer à la question suivante
+                        }
+                } catch (Exception e) {
                     System.out.println("Faux ! Réponse correcte: " + question.getResponse());
                     if (currentPV - question.getPoints() < 0) {
                         currentPV = 0;
@@ -179,6 +201,7 @@ public class Interface_Defis {
                         currentPV -= question.getPoints();
                     }
                     pt_perdu += question.getPoints();
+
                     gestion.wait(2000); // Attend 2 secondes avant de passer à la question suivante
                 }
             }
