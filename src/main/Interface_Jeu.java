@@ -136,7 +136,7 @@ public class Interface_Jeu {
                 }
                 System.out.print("Réponse -> ");
                 String resp = scanner.nextLine();
-
+                
                 // Vérifie si la réponse est correcte
                 if (resp.equalsIgnoreCase(question.getResponse())) {
                     System.out.println("Bonne réponse !");
@@ -154,7 +154,7 @@ public class Interface_Jeu {
                         pt_gagne += question.getPoints();
                         currentPV += question.getPoints();
                         continue;
-                    } else {
+                    } else {  
                             System.out.println("Faux ! Réponse correcte: " + question.getResponse());
                             if (currentPV - question.getPoints() < 0) {
                                 currentPV = 0;
@@ -223,7 +223,7 @@ public class Interface_Jeu {
             cible = scanner.nextLine();
             if (!dbProcess.isUser(cible))
                 System.out.println("ERREUR: Cet utilisateur n'existe pas.");
-            if (!user.getName().equalsIgnoreCase(cible))
+            else if (user.getName().equalsIgnoreCase(cible))
                 System.out.println("ERREUR: Vous ne pouvez pas défier vous-même.");
             else {
                 System.out.println("Confirmer: o/n");
