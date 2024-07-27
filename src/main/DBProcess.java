@@ -11,7 +11,7 @@ import java.util.HashMap;
  * 
  * @author Moi
  * @version 1.0
- */
+*/
 public class DBProcess {
     // URL pour se connecter
     private String db_url = "jdbc:sqlite:src/db/db_jeu.db";
@@ -21,7 +21,6 @@ public class DBProcess {
      * Permet de rajouter un utilisateur dans la bdd.
      * 
      * @param avatar Utilisateur à rajouter
-     * @throws SQLException Pour gérer les traitements SQL
      */
     public void inscrire(Avatar avatar) {
         // Si l'utilisateur n'existe pas
@@ -72,7 +71,6 @@ public class DBProcess {
      * @param username nom d'utilisateur
      * @param password mot de passe de l'utilisateur
      * @return boolean true si le mot de passe de l'utilisateur est correct sinon false
-     * @throws SQLException Pour gérer les traitements SQL
      */
     public boolean connecter(String username, String password) {
         // Si l'utilisateur existe
@@ -112,7 +110,6 @@ public class DBProcess {
      * 
      * @param user nom d'utilisateur
      * @return boolean true si l'utilisateur existe sinon false
-     * @throws SQLException Pour gérer les traitements SQL
      */
     public boolean isUser(String user) {
         String query = "SELECT name FROM Joueurs WHERE name = ?";
@@ -141,7 +138,6 @@ public class DBProcess {
      * 
      * @param user_id identifiant d'un utilisateur
      * @return Un avatar si l'utilisateur existe sinon null
-     * @throws SQLException Pour gérer les traitements SQL
      */
     public Avatar getUserById(String user_id) {
         try {
@@ -174,7 +170,6 @@ public class DBProcess {
      * 
      * @param name nom d'utilisateur
      * @return Un avatar si l'utilisateur existe sinon null
-     * @throws SQLException Pour gérer les traitements SQL
      */
     public Avatar getUserByName(String name) {
         String query = "SELECT * FROM Joueurs WHERE name = ?";
@@ -206,8 +201,7 @@ public class DBProcess {
      * Permet de changer le nom d'un utilisateur.
      * 
      * @param user_id id d'utilisateur
-     * @param user nouveau nom d'utilisateur
-     * @throws SQLException Pour gérer les traitements SQL
+     * @param user_id nouveau nom d'utilisateur
      */
     public void updateUsername(String user_id, String new_username) {
         String query = "UPDATE Joueurs SET name = ? WHERE user_id = ?";
@@ -231,8 +225,7 @@ public class DBProcess {
      * Permet de changer le nom d'un utilisateur.
      * 
      * @param user_id id d'utilisateur
-     * @param user nouveau nom d'utilisateur
-     * @throws SQLException Pour gérer les traitements SQL
+     * @param new_mdp nouveau mot de passe
      */
     public void updateMDP(String user_id, String new_mdp) {
         String query = "UPDATE Joueurs SET mdp = ? WHERE user_id = ?";
